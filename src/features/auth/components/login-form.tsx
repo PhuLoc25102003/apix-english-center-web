@@ -37,7 +37,7 @@ export function LoginForm() {
           htmlFor="email"
           className="text-xs font-semibold uppercase tracking-wider text-[#4B5563]"
         >
-          Email Address
+          Địa chỉ email
         </label>
         <div className="relative">
           <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
@@ -65,10 +65,10 @@ export function LoginForm() {
             htmlFor="password"
             className="text-xs font-semibold uppercase tracking-wider text-[#4B5563]"
           >
-            Password
+            Mật khẩu
           </label>
           <span className="text-xs font-semibold text-[#C90012] hover:underline cursor-pointer">
-            Forgot password?
+            Quên mật khẩu?
           </span>
         </div>
         <div className="relative">
@@ -110,10 +110,10 @@ export function LoginForm() {
         {login.isPending ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Signing In...
+            Đang đăng nhập...
           </>
         ) : (
-          "Sign In"
+          "Đăng nhập"
         )}
       </Button>
     </form>

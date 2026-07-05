@@ -29,12 +29,16 @@ export function useLogin() {
 
     onSuccess: (data) => {
       setAccessToken(data.accessToken);
-      toast.success(`Welcome back, ${data.user.fullName}!`);
+      toast.success(`Chào mừng trở lại, ${data.user.fullName}!`);
       router.push("/dashboard");
     },
 
     onError: (error) => {
-      toast.error(error.message ?? "Invalid credentials. Please try again.");
+      toast.error(
+        error.statusCode === 401
+          ? "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
+          : error.message,
+      );
     },
   });
 }

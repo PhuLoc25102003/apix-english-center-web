@@ -4,8 +4,8 @@ import Image from "next/image";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export const metadata: Metadata = {
-  title: "Login | APIX English Center",
-  description: "Sign in to the APIX English Center Management System.",
+  title: "Đăng nhập | APIX English Center",
+  description: "Đăng nhập hệ thống quản lý Trung tâm Anh ngữ APIX.",
 };
 
 export default function LoginPage() {
@@ -45,10 +45,10 @@ export default function LoginPage() {
 
           <div className="flex flex-col gap-1">
             <h1 className="font-display text-2xl font-bold tracking-tight text-[#111827]">
-              Welcome back
+              Chào mừng trở lại
             </h1>
             <p className="text-sm text-[#6B7280]">
-              Sign in to manage your English center
+              Đăng nhập để truy cập hệ thống quản lý trung tâm
             </p>
           </div>
         </div>
@@ -58,16 +58,16 @@ export default function LoginPage() {
 
         {/* ── Form Hint / Help ── */}
         <div className="mt-8 rounded-lg border border-[#FF161A]/10 bg-[#FFE8EA]/40 p-3 text-center text-xs text-[#C90012]">
-          <span className="font-semibold block mb-0.5">Demo Credentials</span>
+          <span className="font-semibold block mb-0.5">Tài khoản dùng thử</span>
           Email: <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#FF161A]/10 select-all">owner@apixenglish.com</code>
           <br />
-          Password: <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#FF161A]/10 select-all">Admin@123456</code>
+          Mật khẩu: <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#FF161A]/10 select-all">Admin@123456</code>
         </div>
       </div>
 
       {/* ── Footer ── */}
       <p className="relative z-10 mt-8 text-xs text-[#9CA3AF]">
-        © {new Date().getFullYear()} APIX English Center. All rights reserved.
+        © {new Date().getFullYear()} APIX English Center. Mọi quyền được bảo lưu.
       </p>
     </main>
   );
