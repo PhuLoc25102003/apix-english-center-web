@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Edit, User, Phone, Mail, MapPin, Briefcase, FileText, Clock } from "lucide-react";
+import { ArrowLeft, Edit, Phone, Mail, MapPin, Briefcase, FileText, Clock } from "lucide-react";
 
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,13 @@ import { ErrorState } from "@/components/feedback/error-state";
 import { useParent } from "../hooks/use-parent";
 import { ParentChildrenSection } from "./parent-children-section";
 
+// Modal refactoring imports
+import { CrudFormModal } from "@/components/modals/crud-form-modal";
+import { parentFormConfig } from "../configs/parent-form.config";
+import { parentSchema } from "../schemas/parent.schema";
+import { useUpdateParent } from "../hooks/use-update-parent";
+import { useConfirm } from "@/hooks/use-confirm";
+
 interface ParentDetailContainerProps {
   id: string;
 }
@@ -24,6 +31,10 @@ interface ParentDetailContainerProps {
 export function ParentDetailContainer({ id }: ParentDetailContainerProps) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch, isRefetching } = useParent(id);
+  
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const updateMutation = useUpdateParent();
+  const confirm = useConfirm();
 
   if (isLoading) {
     return <LoadingState variant="spinner" className="min-h-[400px]" />;
@@ -76,7 +87,7 @@ export function ParentDetailContainer({ id }: ParentDetailContainerProps) {
         description={`Hồ sơ chi tiết của phụ huynh ${parent.fullName} (Mã: ${parent.parentCode}).`}
         action={
           <Button
-            onClick={() => router.push(`/parents/${parent.id}/edit`)}
+            onClick={() => setIsModalOpen(true)}
             className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Edit className="h-4 w-4" />
@@ -165,6 +176,43 @@ export function ParentDetailContainer({ id }: ParentDetailContainerProps) {
       <div className="mt-4">
         <ParentChildrenSection parentId={parent.id} />
       </div>
+
+      {/* Reusable form modal */}
+      <CrudFormModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        title="Chỉnh sửa hồ sơ phụ huynh"
+        description="Cập nhật thông tin chi tiết của phụ huynh."
+        submitLabel="Cập nhật thông tin"
+        configs={parentFormConfig}
+        validationSchema={parentSchema}
+        initialValues={parent}
+        onSubmit={async (values) => {
+          // Intercept to clean up empty email to null
+          const payload = {
+            ...values,
+            email: values.email ? values.email.trim() : null,
+          };
+          const ok = await confirm({
+            title: "Xác nhận cập nhật",
+            description: `Bạn có chắc chắn muốn lưu các thay đổi cho phụ huynh ${parent.fullName}?`,
+            confirmLabel: "Cập nhật",
+            cancelLabel: "Hủy",
+            variant: "default",
+          });
+          if (ok) {
+            await updateMutation.mutateAsync(
+              { id: parent.id, data: payload },
+              {
+                onSuccess: () => {
+                  setIsModalOpen(false);
+                  refetch();
+                },
+              }
+            );
+          }
+        }}
+      />
     </div>
   );
 }

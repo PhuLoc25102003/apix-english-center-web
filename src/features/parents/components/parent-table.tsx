@@ -8,8 +8,6 @@
 
 import * as React from "react";
 import { MoreVertical, Eye, Edit, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import {
@@ -26,16 +24,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteParent } from "../hooks/use-delete-parent";
 import type { Parent } from "../types/parent.type";
 
 interface ParentTableProps {
   parents: Parent[];
+  onEdit: (id: string) => void;
 }
 
-export function ParentTable({ parents }: ParentTableProps) {
+export function ParentTable({ parents, onEdit }: ParentTableProps) {
   const deleteMutation = useDeleteParent();
   const router = useRouter();
   const confirm = useConfirm();
@@ -89,7 +87,7 @@ export function ParentTable({ parents }: ParentTableProps) {
                           <span>Chi tiết</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => router.push(`/parents/${parent.id}/edit`)}
+                          onClick={() => onEdit(parent.id)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Edit className="h-4 w-4 text-slate-400" />

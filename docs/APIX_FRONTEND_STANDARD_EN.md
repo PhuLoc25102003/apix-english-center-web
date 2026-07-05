@@ -840,26 +840,68 @@ Tabs
   Audit
 ```
 
-### 13.3 Create/update flow
+#### 13.3 Reusable CRUD Modal Form System Standard
 
-Use modal for simple forms.  
-Use full page for complex workflows.
+To ensure a cohesive, fast, and high-performance user experience, all CRUD operations (Create/Edit) must be implemented using the **Reusable CRUD Modal Form System** rather than separate standalone pages or route redirections, unless there is a highly specific, approved exception (e.g., multi-step wizards or extremely large complex datasets).
 
-Simple modal examples:
+#### Core Architecture Principles
+- **Single Reusable Modal**: Both Create and Edit modes share the exact same `CrudFormModal` component instance to maintain visual alignment and reduce code duplication.
+- **Empty Form on Create**: Opening the modal in Create mode must automatically initialize the form fields with empty or default values defined in the configuration.
+- **Details Fetching on Edit**: Opening the modal in Edit mode must trigger a detail API query (e.g. `useStudent(id)` or `useParent(id)`). The modal handles the details loading state and maps the loaded data onto form values.
+- **Form Config Driven**: Each feature defines its own form inputs in a dedicated configuration file (e.g. `student-form.config.tsx`) which specifies field name, label, placeholder, type, grid layout columns, icons, and list options.
+- **Strict Validation**: The form schema is validated programmatically using React Hook Form and Zod schemas (`studentSchema`, `parentSchema`), retaining full support for complex refinement checks and validation rules.
 
-```text
-Create campus
-Create room
-Create position
+#### Recommended Directory & Naming Conventions
+- Reusable form renderer: `src/components/forms/form-input-renderer.tsx`
+- Reusable CRUD modal: `src/components/modals/crud-form-modal.tsx`
+- Feature-specific configuration: `src/features/<feature-name>/configs/<feature-name>-form.config.tsx`
+  - *Example configuration name*: `studentFormConfig` inside `student-form.config.tsx`
+- Zod schema location: `src/features/<feature-name>/schemas/<feature-name>.schema.ts`
+- Feature container: `src/features/<feature-name>/components/<feature-name>-list-container.tsx`
+
+#### Supported Input Config Structure (`FormInputConfig`)
+Form fields must be declared using the `FormInputConfig` shape:
+```typescript
+export interface FormInputConfig {
+  name: string;               // Key in the schema payload
+  label: string;              // Text display label or checkbox text
+  placeholder?: string;       // Input placeholder text
+  type: InputType;            // Type of field (text, textarea, select, multi-select, switch, checkbox, radio, custom, section-header)
+  required?: boolean;         // Visual indicator (*)
+  options?: InputOption[];    // Array of { value, label } for dropdowns, radios, and multi-select tags
+  disabled?: boolean;         // Input disable state
+  hidden?: boolean;           // Input visibility toggle
+  colSpan?: 1 | 2;            // Grid layout span: 1 (half width) or 2 (full width)
+  icon?: React.ReactNode;     // Absolute-positioned Lucide icon prefix
+  customRender?: (props: {    // React render function for advanced custom fields
+    field: any;
+    error?: string;
+    disabled?: boolean;
+  }) => React.ReactNode;
+}
 ```
 
-Full page examples:
+#### API & Submit Mutation Flow
+1. **Triggering mutations**: Form submit must use TanStack Query mutations (`useCreateStudent` / `useUpdateStudent`) called within `onSubmit`.
+2. **OnSuccess Actions**:
+   - Invalidate lists and detail query keys using the centralized query keys module (e.g. `studentKeys.lists()` and `studentKeys.detail(id)`).
+   - Show a successful toast notification (via `sonner`).
+   - Close the modal and reset states automatically.
+3. **OnError Actions**: Display raw API errors inline or as standard error alerts.
 
-```text
-Create student with parent links
-Create class with schedule and staff
-Create invoice with items and discounts
-```
+#### UI & UX Behavior Rules
+- **Reset-On-Close**: Forms must be fully reset back to default values when closed, ensuring subsequent creation attempts start with a clean slate.
+- **Glass-morphic Design**: The modal uses the application's premium styling: translucent backgrounds, rounded borders (`rounded-2xl`), subtle borders (`border-white/40`), and brand red accents (`bg-[#FF161A]`).
+- **Submit Button State**: Submit button must disable and show a loading spinner (e.g., `Loader2` rotating animation) during API execution to prevent double submission.
+- **Programmatic Confirms**: Destructive or critical updates must trigger programmatically via the global `useConfirm` hook before invoking update/delete APIs.
+
+#### Acceptance Criteria for Future CRUD pages
+- [ ] No route redirection to separate sub-routes for creation (`/new`) or modification (`/edit`).
+- [ ] Both actions use a single instances of the `CrudFormModal` component in the list/detail parent view.
+- [ ] Inputs are fully configured dynamically in `src/features/<feature-name>/configs/`.
+- [ ] Successful submit updates listings/details immediately via query invalidations.
+- [ ] Validation errors block submissions and render inline with clear localized messages.
+
 
 ---
 

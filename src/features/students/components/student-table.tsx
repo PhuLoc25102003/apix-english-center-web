@@ -10,7 +10,6 @@
 import * as React from "react";
 import { MoreVertical, Eye, Edit, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import {
   Table,
@@ -33,9 +32,10 @@ import type { Student, StudentType, AccessMode } from "../types/student.type";
 
 interface StudentTableProps {
   students: Student[];
+  onEdit: (id: string) => void;
 }
 
-export function StudentTable({ students }: StudentTableProps) {
+export function StudentTable({ students, onEdit }: StudentTableProps) {
   const deleteMutation = useDeleteStudent();
   const router = useRouter();
   const confirm = useConfirm();
@@ -132,7 +132,7 @@ export function StudentTable({ students }: StudentTableProps) {
                           <span>Chi tiết</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => router.push(`/students/${student.id}/edit`)}
+                          onClick={() => onEdit(student.id)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Edit className="h-4 w-4 text-slate-400" />

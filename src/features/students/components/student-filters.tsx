@@ -28,6 +28,27 @@ interface StudentFiltersProps {
   onStatusChange: (value: string) => void;
 }
 
+const studentTypeItems = [
+  { value: "ALL", label: "Tất cả" },
+  { value: "KINDERGARTEN", label: "Mầm non" },
+  { value: "CHILD", label: "Tiểu học" },
+  { value: "TEENAGER", label: "Thiếu niên" },
+  { value: "ADULT", label: "Người lớn" },
+];
+
+const accessModeItems = [
+  { value: "ALL", label: "Tất cả" },
+  { value: "NO_ACCOUNT", label: "Không tài khoản" },
+  { value: "PARENT_MANAGED", label: "PH quản lý" },
+  { value: "OWN_ACCOUNT", label: "TK riêng" },
+];
+
+const statusItems = [
+  { value: "ALL", label: "Tất cả" },
+  { value: "ACTIVE", label: "Hoạt động" },
+  { value: "INACTIVE", label: "Ngưng hoạt động" },
+];
+
 export function StudentFilters({
   search,
   onSearchChange,
@@ -49,60 +70,60 @@ export function StudentFilters({
       />
 
       {/* Select Dropdowns */}
-      <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+      <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
         {/* Student Type Filter */}
-        <div className="flex-1 min-w-[140px] sm:flex-none">
-          <Select
-            value={studentType || "ALL"}
-            onValueChange={(val: string | null) => onStudentTypeChange(!val || val === "ALL" ? "" : val)}
-          >
-            <SelectTrigger className="w-full sm:w-[150px] bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors">
-              <SelectValue placeholder="Độ tuổi / Loại" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Mọi độ tuổi</SelectItem>
-              <SelectItem value="KINDERGARTEN">Mầm non (Kindergarten)</SelectItem>
-              <SelectItem value="CHILD">Tiểu học (Child)</SelectItem>
-              <SelectItem value="TEENAGER">Thiếu niên (Teenager)</SelectItem>
-              <SelectItem value="ADULT">Người lớn (Adult)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={studentType || "ALL"}
+          onValueChange={(val: string | null) => onStudentTypeChange(!val || val === "ALL" ? "" : val)}
+          items={studentTypeItems}
+        >
+          <SelectTrigger className="w-full sm:w-auto bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors px-3 py-1.5 h-9 rounded-xl flex items-center gap-1 cursor-pointer">
+            <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider select-none mr-0.5">Độ tuổi:</span>
+            <SelectValue placeholder="Tất cả" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả</SelectItem>
+            <SelectItem value="KINDERGARTEN">Mầm non</SelectItem>
+            <SelectItem value="CHILD">Tiểu học</SelectItem>
+            <SelectItem value="TEENAGER">Thiếu niên</SelectItem>
+            <SelectItem value="ADULT">Người lớn</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* Access Mode Filter */}
-        <div className="flex-1 min-w-[140px] sm:flex-none">
-          <Select
-            value={accessMode || "ALL"}
-            onValueChange={(val: string | null) => onAccessModeChange(!val || val === "ALL" ? "" : val)}
-          >
-            <SelectTrigger className="w-full sm:w-[170px] bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors">
-              <SelectValue placeholder="Chế độ tài khoản" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Mọi chế độ tài khoản</SelectItem>
-              <SelectItem value="NO_ACCOUNT">Không có tài khoản</SelectItem>
-              <SelectItem value="PARENT_MANAGED">Phụ huynh quản lý</SelectItem>
-              <SelectItem value="OWN_ACCOUNT">Tài khoản riêng</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={accessMode || "ALL"}
+          onValueChange={(val: string | null) => onAccessModeChange(!val || val === "ALL" ? "" : val)}
+          items={accessModeItems}
+        >
+          <SelectTrigger className="w-full sm:w-auto bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors px-3 py-1.5 h-9 rounded-xl flex items-center gap-1 cursor-pointer">
+            <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider select-none mr-0.5">Tài khoản:</span>
+            <SelectValue placeholder="Tất cả" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả</SelectItem>
+            <SelectItem value="NO_ACCOUNT">Không tài khoản</SelectItem>
+            <SelectItem value="PARENT_MANAGED">PH quản lý</SelectItem>
+            <SelectItem value="OWN_ACCOUNT">TK riêng</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* Status Filter */}
-        <div className="flex-1 min-w-[120px] sm:flex-none">
-          <Select
-            value={status || "ALL"}
-            onValueChange={(val: string | null) => onStatusChange(!val || val === "ALL" ? "" : val)}
-          >
-            <SelectTrigger className="w-full sm:w-[140px] bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors">
-              <SelectValue placeholder="Trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Mọi trạng thái</SelectItem>
-              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-              <SelectItem value="INACTIVE">Ngưng hoạt động</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={status || "ALL"}
+          onValueChange={(val: string | null) => onStatusChange(!val || val === "ALL" ? "" : val)}
+          items={statusItems}
+        >
+          <SelectTrigger className="w-full sm:w-auto bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors px-3 py-1.5 h-9 rounded-xl flex items-center gap-1 cursor-pointer">
+            <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider select-none mr-0.5">Trạng thái:</span>
+            <SelectValue placeholder="Tất cả" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả</SelectItem>
+            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+            <SelectItem value="INACTIVE">Ngưng hoạt động</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

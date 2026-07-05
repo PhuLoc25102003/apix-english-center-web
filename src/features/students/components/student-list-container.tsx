@@ -4,13 +4,11 @@
  * src/features/students/components/student-list-container.tsx
  *
  * Container component for the Student List. Handles state, fetching, error/empty states,
- * and passes events down to filters and tables.
+ * modal form workflows, and passes events down to filters and tables.
  */
 
 import * as React from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
@@ -22,8 +20,16 @@ import { useStudents } from "../hooks/use-students";
 import { StudentFilters } from "./student-filters";
 import { StudentTable } from "./student-table";
 
+// Modal refactoring imports
+import { CrudFormModal } from "@/components/modals/crud-form-modal";
+import { studentFormConfig } from "../configs/student-form.config";
+import { studentSchema, type StudentFormValues } from "../schemas/student.schema";
+import { useStudent } from "../hooks/use-student";
+import { useCreateStudent } from "../hooks/use-create-student";
+import { useUpdateStudent } from "../hooks/use-update-student";
+import { useConfirm } from "@/hooks/use-confirm";
+
 export function StudentListContainer() {
-  const router = useRouter();
   const [search, setSearch] = React.useState("");
   const [studentType, setStudentType] = React.useState("");
   const [accessMode, setAccessMode] = React.useState("");
@@ -31,10 +37,30 @@ export function StudentListContainer() {
   const [page, setPage] = React.useState(1);
   const limit = 10;
 
-  // Reset page when filters change
-  React.useEffect(() => {
+  // Modal form states
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedStudentId, setSelectedStudentId] = React.useState<string | null>(null);
+
+  // Synchronous filter update handlers that reset the page to 1
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
     setPage(1);
-  }, [search, studentType, accessMode, status]);
+  };
+
+  const handleStudentTypeChange = (val: string) => {
+    setStudentType(val);
+    setPage(1);
+  };
+
+  const handleAccessModeChange = (val: string) => {
+    setAccessMode(val);
+    setPage(1);
+  };
+
+  const handleStatusChange = (val: string) => {
+    setStatus(val);
+    setPage(1);
+  };
 
   const { data, isLoading, isError, error, refetch, isRefetching } = useStudents({
     page,
@@ -45,12 +71,62 @@ export function StudentListContainer() {
     status: status || undefined,
   });
 
+  // Query detail student for Edit mode
+  const { data: studentDetail, isLoading: isLoadingDetail } = useStudent(
+    selectedStudentId || ""
+  );
+
+  const createMutation = useCreateStudent();
+  const updateMutation = useUpdateStudent();
+  const confirm = useConfirm();
+
   const handleClearFilters = () => {
     setSearch("");
     setStudentType("");
     setAccessMode("");
     setStatus("");
     setPage(1);
+  };
+
+  const handleCreate = () => {
+    setSelectedStudentId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    setSelectedStudentId(id);
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = async (values: StudentFormValues) => {
+    if (selectedStudentId) {
+      // Edit mode
+      const ok = await confirm({
+        title: "Xác nhận cập nhật",
+        description: `Bạn có chắc chắn muốn lưu các thay đổi cho học viên ${studentDetail?.data?.fullName || ""}?`,
+        confirmLabel: "Cập nhật",
+        cancelLabel: "Hủy",
+        variant: "default",
+      });
+      if (ok) {
+        await updateMutation.mutateAsync(
+          { id: selectedStudentId, data: values },
+          {
+            onSuccess: () => {
+              setIsModalOpen(false);
+              setSelectedStudentId(null);
+            },
+          }
+        );
+      }
+    } else {
+      // Create mode
+      await createMutation.mutateAsync(values, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+        },
+      });
+    }
   };
 
   return (
@@ -60,7 +136,7 @@ export function StudentListContainer() {
         description="Tra cứu danh sách học viên, theo dõi trạng thái học tập và thông tin kết nối tài khoản."
         action={
           <Button
-            onClick={() => router.push("/students/new")}
+            onClick={handleCreate}
             className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -71,13 +147,13 @@ export function StudentListContainer() {
 
       <StudentFilters
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         studentType={studentType}
-        onStudentTypeChange={setStudentType}
+        onStudentTypeChange={handleStudentTypeChange}
         accessMode={accessMode}
-        onAccessModeChange={setAccessMode}
+        onAccessModeChange={handleAccessModeChange}
         status={status}
-        onStatusChange={setStatus}
+        onStatusChange={handleStatusChange}
       />
 
       {isLoading ? (
@@ -102,7 +178,7 @@ export function StudentListContainer() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <StudentTable students={data.data} />
+          <StudentTable students={data.data} onEdit={handleEdit} />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 px-2">
@@ -140,6 +216,28 @@ export function StudentListContainer() {
           </div>
         </div>
       )}
+
+      {/* Reusable form modal */}
+      <CrudFormModal
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) setSelectedStudentId(null);
+        }}
+        title={selectedStudentId ? "Chỉnh sửa hồ sơ học viên" : "Thêm học viên mới"}
+        description={
+          selectedStudentId
+            ? "Cập nhật thông tin chi tiết của học viên."
+            : "Nhập thông tin cá nhân và thiết lập chế độ tài khoản cho học viên mới."
+        }
+        submitLabel={selectedStudentId ? "Cập nhật thông tin" : "Tạo học viên"}
+        configs={studentFormConfig}
+        validationSchema={studentSchema}
+        initialValues={selectedStudentId ? studentDetail?.data : undefined}
+        onSubmit={handleFormSubmit}
+        isLoadingDetails={selectedStudentId ? isLoadingDetail : false}
+      />
     </div>
   );
 }
+

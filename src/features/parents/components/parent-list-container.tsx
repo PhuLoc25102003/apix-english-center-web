@@ -8,7 +8,6 @@
 
 import * as React from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
@@ -20,16 +19,29 @@ import { EmptyState } from "@/components/feedback/empty-state";
 import { useParents } from "../hooks/use-parents";
 import { ParentTable } from "./parent-table";
 
+// Modal refactoring imports
+import { CrudFormModal } from "@/components/modals/crud-form-modal";
+import { parentFormConfig } from "../configs/parent-form.config";
+import { parentSchema, type ParentFormValues } from "../schemas/parent.schema";
+import { useParent } from "../hooks/use-parent";
+import { useCreateParent } from "../hooks/use-create-parent";
+import { useUpdateParent } from "../hooks/use-update-parent";
+import { useConfirm } from "@/hooks/use-confirm";
+
 export function ParentListContainer() {
-  const router = useRouter();
   const [search, setSearch] = React.useState("");
   const [page, setPage] = React.useState(1);
   const limit = 10;
 
-  // Reset page when filter changes
-  React.useEffect(() => {
+  // Modal form states
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null);
+
+  // Synchronous filter update handler that resets page to 1
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
     setPage(1);
-  }, [search]);
+  };
 
   const { data, isLoading, isError, error, refetch, isRefetching } = useParents({
     page,
@@ -37,9 +49,65 @@ export function ParentListContainer() {
     search: search || undefined,
   });
 
+  // Query detail parent for Edit mode
+  const { data: parentDetail, isLoading: isLoadingDetail } = useParent(
+    selectedParentId || ""
+  );
+
+  const createMutation = useCreateParent();
+  const updateMutation = useUpdateParent();
+  const confirm = useConfirm();
+
   const handleClearFilters = () => {
     setSearch("");
     setPage(1);
+  };
+
+  const handleCreate = () => {
+    setSelectedParentId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    setSelectedParentId(id);
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = async (values: ParentFormValues) => {
+    // Intercept to clean up empty email to null
+    const payload = {
+      ...values,
+      email: values.email ? values.email.trim() : null,
+    };
+
+    if (selectedParentId) {
+      // Edit mode
+      const ok = await confirm({
+        title: "Xác nhận cập nhật",
+        description: `Bạn có chắc chắn muốn lưu các thay đổi cho phụ huynh ${parentDetail?.data?.fullName || ""}?`,
+        confirmLabel: "Cập nhật",
+        cancelLabel: "Hủy",
+        variant: "default",
+      });
+      if (ok) {
+        await updateMutation.mutateAsync(
+          { id: selectedParentId, data: payload },
+          {
+            onSuccess: () => {
+              setIsModalOpen(false);
+              setSelectedParentId(null);
+            },
+          }
+        );
+      }
+    } else {
+      // Create mode
+      await createMutation.mutateAsync(payload, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+        },
+      });
+    }
   };
 
   return (
@@ -49,7 +117,7 @@ export function ParentListContainer() {
         description="Tra cứu và quản lý danh sách hồ sơ phụ huynh, thông tin liên lạc và tài khoản truy cập."
         action={
           <Button
-            onClick={() => router.push("/parents/new")}
+            onClick={handleCreate}
             className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -62,7 +130,7 @@ export function ParentListContainer() {
         <SearchInput
           placeholder="Tìm kiếm tên, SĐT, email..."
           value={search}
-          onChange={setSearch}
+          onChange={handleSearchChange}
           className="w-full sm:max-w-xs"
         />
       </div>
@@ -89,7 +157,7 @@ export function ParentListContainer() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <ParentTable parents={data.data} />
+          <ParentTable parents={data.data} onEdit={handleEdit} />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 px-2">
@@ -127,6 +195,28 @@ export function ParentListContainer() {
           </div>
         </div>
       )}
+
+      {/* Reusable form modal */}
+      <CrudFormModal
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) setSelectedParentId(null);
+        }}
+        title={selectedParentId ? "Chỉnh sửa hồ sơ phụ huynh" : "Thêm hồ sơ phụ huynh mới"}
+        description={
+          selectedParentId
+            ? "Cập nhật thông tin chi tiết của phụ huynh."
+            : "Nhập thông tin cá nhân và phương thức liên lạc của phụ huynh mới."
+        }
+        submitLabel={selectedParentId ? "Cập nhật thông tin" : "Thêm phụ huynh"}
+        configs={parentFormConfig}
+        validationSchema={parentSchema}
+        initialValues={selectedParentId ? parentDetail?.data : undefined}
+        onSubmit={handleFormSubmit}
+        isLoadingDetails={selectedParentId ? isLoadingDetail : false}
+      />
     </div>
   );
 }
+

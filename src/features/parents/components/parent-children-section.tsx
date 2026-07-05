@@ -36,9 +36,17 @@ import { ErrorState } from "@/components/feedback/error-state";
 import { useConfirm } from "@/hooks/use-confirm";
 
 import { useStudents } from "@/features/students/hooks/use-students";
+import type { Student } from "@/features/students/types/student.type";
 import { useParentChildren } from "../hooks/use-parent-children";
 import { useLinkParentStudent } from "../hooks/use-link-parent-student";
 import { useUnlinkParentStudent } from "../hooks/use-unlink-parent-student";
+
+const relationshipItems = [
+  { value: "MOTHER", label: "Mẹ (Mother)" },
+  { value: "FATHER", label: "Bố (Father)" },
+  { value: "GUARDIAN", label: "Người giám hộ (Guardian)" },
+  { value: "OTHER", label: "Mối quan hệ khác" },
+];
 
 const linkRelationshipSchema = z.object({
   studentId: z.string().min(1, "Vui lòng chọn học viên."),
@@ -59,6 +67,7 @@ interface ParentChildrenSectionProps {
 export function ParentChildrenSection({ parentId }: ParentChildrenSectionProps) {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = React.useState(false);
   const [studentSearch, setStudentSearch] = React.useState("");
+  const [selectedStudentObj, setSelectedStudentObj] = React.useState<Student | null>(null);
   const confirm = useConfirm();
 
   // Queries & Mutations
@@ -71,6 +80,17 @@ export function ParentChildrenSection({ parentId }: ParentChildrenSectionProps) 
     limit: 50,
     search: studentSearch || undefined,
   });
+
+  const studentItems = React.useMemo(() => {
+    const list = [...(studentsCatalog?.data ?? [])];
+    if (selectedStudentObj && !list.some((o) => o.id === selectedStudentObj.id)) {
+      list.unshift(selectedStudentObj);
+    }
+    return list.map((s) => ({
+      value: s.id,
+      label: `${s.fullName} (${s.studentCode})`,
+    }));
+  }, [studentsCatalog?.data, selectedStudentObj]);
 
   const {
     register,
@@ -115,6 +135,7 @@ export function ParentChildrenSection({ parentId }: ParentChildrenSectionProps) 
           setIsLinkDialogOpen(false);
           reset();
           setStudentSearch("");
+          setSelectedStudentObj(null);
         },
       }
     );
@@ -321,24 +342,36 @@ export function ParentChildrenSection({ parentId }: ParentChildrenSectionProps) 
                     value={field.value}
                     onValueChange={(val: string | null) => {
                       field.onChange(val || "");
+                      const student = studentsCatalog?.data?.find((s) => s.id === val);
+                      if (student) {
+                        setSelectedStudentObj(student);
+                      }
                     }}
                     disabled={linkMutation.isPending}
+                    items={studentItems}
                   >
                     <SelectTrigger id="studentId" className="w-full h-10 bg-white/60 focus:bg-white border border-border/60 text-sm">
                       <SelectValue placeholder={isLoadingCatalog ? "Đang tải..." : "Chọn học viên liên kết"} />
                     </SelectTrigger>
                     <SelectContent className="max-h-48 overflow-y-auto">
-                      {studentsCatalog?.data && studentsCatalog.data.length > 0 ? (
-                        studentsCatalog.data.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.fullName} ({s.studentCode})
+                      {(() => {
+                        const options = [...(studentsCatalog?.data ?? [])];
+                        if (selectedStudentObj && !options.some((o) => o.id === selectedStudentObj.id)) {
+                          options.unshift(selectedStudentObj);
+                        }
+                        if (options.length > 0) {
+                          return options.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.fullName} ({s.studentCode})
+                            </SelectItem>
+                          ));
+                        }
+                        return (
+                          <SelectItem value="NONE" disabled>
+                            Không tìm thấy học viên nào
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="NONE" disabled>
-                          Không tìm thấy học viên nào
-                        </SelectItem>
-                      )}
+                        );
+                      })()}
                     </SelectContent>
                   </Select>
                 )}
@@ -361,6 +394,7 @@ export function ParentChildrenSection({ parentId }: ParentChildrenSectionProps) 
                     value={field.value}
                     onValueChange={(val: string | null) => field.onChange(val || "")}
                     disabled={linkMutation.isPending}
+                    items={relationshipItems}
                   >
                     <SelectTrigger id="relationship" className="w-full h-10 bg-white/60 focus:bg-white border-border/60 text-sm">
                       <SelectValue placeholder="Chọn quan hệ" />

@@ -20,6 +20,13 @@ import { useStudent } from "../hooks/use-student";
 import { StudentParentSection } from "./student-parent-section";
 import type { StudentType, AccessMode } from "../types/student.type";
 
+// Modal refactoring imports
+import { CrudFormModal } from "@/components/modals/crud-form-modal";
+import { studentFormConfig } from "../configs/student-form.config";
+import { studentSchema } from "../schemas/student.schema";
+import { useUpdateStudent } from "../hooks/use-update-student";
+import { useConfirm } from "@/hooks/use-confirm";
+
 interface StudentDetailContainerProps {
   id: string;
 }
@@ -27,6 +34,10 @@ interface StudentDetailContainerProps {
 export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch, isRefetching } = useStudent(id);
+  
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const updateMutation = useUpdateStudent();
+  const confirm = useConfirm();
 
   if (isLoading) {
     return <LoadingState variant="spinner" className="min-h-[400px]" />;
@@ -105,7 +116,7 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
         description={`Hồ sơ chi tiết của học viên ${student.fullName} (Mã: ${student.studentCode}).`}
         action={
           <Button
-            onClick={() => router.push(`/students/${student.id}/edit`)}
+            onClick={() => setIsModalOpen(true)}
             className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Edit className="h-4 w-4" />
@@ -201,6 +212,38 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
       <div className="mt-4">
         <StudentParentSection studentId={student.id} />
       </div>
+
+      {/* Reusable form modal */}
+      <CrudFormModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        title="Chỉnh sửa hồ sơ học viên"
+        description="Cập nhật thông tin chi tiết của học viên."
+        submitLabel="Cập nhật thông tin"
+        configs={studentFormConfig}
+        validationSchema={studentSchema}
+        initialValues={student}
+        onSubmit={async (values) => {
+          const ok = await confirm({
+            title: "Xác nhận cập nhật",
+            description: `Bạn có chắc chắn muốn lưu các thay đổi cho học viên ${student.fullName}?`,
+            confirmLabel: "Cập nhật",
+            cancelLabel: "Hủy",
+            variant: "default",
+          });
+          if (ok) {
+            await updateMutation.mutateAsync(
+              { id: student.id, data: values },
+              {
+                onSuccess: () => {
+                  setIsModalOpen(false);
+                  refetch();
+                },
+              }
+            );
+          }
+        }}
+      />
     </div>
   );
 }
