@@ -8,3 +8,5 @@ export * from "./hooks/use-delete-student";
 export * from "./components/student-table";
 export * from "./components/student-filters";
 export * from "./components/student-list-container";
+export * from "./components/student-form";
+export * from "./schemas/student.schema";
