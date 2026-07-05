@@ -17,6 +17,7 @@ import { LoadingState } from "@/components/feedback/loading-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { StatusBadge } from "@/components/common/status-badge";
 import { useStudent } from "../hooks/use-student";
+import { StudentParentSection } from "./student-parent-section";
 import type { StudentType, AccessMode } from "../types/student.type";
 
 interface StudentDetailContainerProps {
@@ -194,6 +195,11 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Linked Parents Relationship Section */}
+      <div className="mt-4">
+        <StudentParentSection studentId={student.id} />
       </div>
     </div>
   );

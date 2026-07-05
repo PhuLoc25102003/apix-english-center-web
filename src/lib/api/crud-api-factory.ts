@@ -68,16 +68,41 @@ export function createCrudApi<
      */
     async getAll(params?: ListParams): Promise<PageResponse<TEntity>> {
       try {
-        const { data } = await apiClient.get<PageResponse<TEntity>>(endpoint, {
-          params,
+        const apiParams: Record<string, any> = { ...params };
+        if (params?.page !== undefined) {
+          apiParams.page = Math.max(0, params.page - 1);
+        }
+        if (params?.limit !== undefined) {
+          apiParams.size = params.limit;
+          delete apiParams.limit;
+        }
+
+        const { data } = await apiClient.get<any>(endpoint, {
+          params: apiParams,
         });
+
+        if (data && data.meta) {
+          const backendMeta = data.meta;
+          const page = (backendMeta.page !== undefined ? backendMeta.page : 0) + 1;
+          const limit = backendMeta.size !== undefined ? backendMeta.size : (params?.limit ?? 10);
+          const total = backendMeta.totalElements !== undefined ? backendMeta.totalElements : 0;
+          const totalPages = backendMeta.totalPages !== undefined ? backendMeta.totalPages : 1;
+
+          data.meta = {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1,
+          };
+        }
+
         return data;
       } catch (err) {
         throw parseApiError(err);
       }
-    },
-
-    /**
+    },    /**
      * Fetch a single entity by ID.
      * GET {endpoint}/{id}
      */
