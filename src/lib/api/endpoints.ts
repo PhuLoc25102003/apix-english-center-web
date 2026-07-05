@@ -21,6 +21,7 @@ const base = {
   parents: "/parents",
   campuses: "/campuses",
   rooms: "/rooms",
+  levels: "/levels",
   courses: "/courses",
   classes: "/classes",
   enrollments: "/enrollments",
@@ -89,6 +90,15 @@ export const API_ENDPOINTS = {
     byCampus: (campusId: string) => `${base.campuses}/${campusId}/rooms`,
   },
 
+  // ── Levels ────────────────────────────────────────────────────────────────
+  levels: {
+    list: base.levels,
+    create: base.levels,
+    detail: (id: string) => `${base.levels}/${id}`,
+    update: (id: string) => `${base.levels}/${id}`,
+    delete: (id: string) => `${base.levels}/${id}`,
+  },
+
   // ── Courses ───────────────────────────────────────────────────────────────
   courses: {
     list: base.courses,
@@ -116,6 +126,7 @@ export const API_ENDPOINTS = {
     create: base.enrollments,
     detail: (id: string) => `${base.enrollments}/${id}`,
     update: (id: string) => `${base.enrollments}/${id}`,
+    byClass: (classId: string) => `${base.enrollments}/class/${classId}`,
     transfer: (id: string) => `${base.enrollments}/${id}/transfer`,
     freeze: (id: string) => `${base.enrollments}/${id}/freeze`,
     unfreeze: (id: string) => `${base.enrollments}/${id}/unfreeze`,

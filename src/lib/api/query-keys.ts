@@ -64,6 +64,16 @@ export const roomKeys = {
   detail: (id: string) => [...roomKeys.all, "detail", id] as const,
 };
 
+// ── Levels ────────────────────────────────────────────────────────────────────
+
+export const levelKeys = {
+  all: ["levels"] as const,
+  lists: () => [...levelKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...levelKeys.lists(), filters] as const,
+  detail: (id: string) => [...levelKeys.all, "detail", id] as const,
+};
+
 // ── Courses ───────────────────────────────────────────────────────────────────
 
 export const courseKeys = {
