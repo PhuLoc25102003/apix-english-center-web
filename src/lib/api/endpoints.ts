@@ -1,66 +1,173 @@
 /**
- * APIX API endpoint constants — standard §9
+ * src/lib/api/endpoints.ts
  *
- * Centralise all endpoint paths here.
- * Feature API files import from this module — never hardcode paths inline.
+ * Centralised API endpoint registry.
  *
- * Convention:
- *   export const STUDENTS = '/students' as const
- *   export const STUDENT_BY_ID = (id: string) => `/students/${id}` as const
+ * Rules:
+ *  - Never hardcode paths in feature API files — import from here.
+ *  - All paths are relative to the Axios baseURL (NEXT_PUBLIC_API_BASE_URL).
+ *  - Dynamic segments use factory functions.
+ *
+ * Usage:
+ *   import { API_ENDPOINTS } from '@/lib/api/endpoints'
+ *
+ *   apiClient.get(API_ENDPOINTS.students.list)
+ *   apiClient.get(API_ENDPOINTS.students.detail(id))
  */
 
-// ── Auth ──────────────────────────────────────────
-export const AUTH_LOGIN = "/auth/login" as const;
-export const AUTH_LOGOUT = "/auth/logout" as const;
-export const AUTH_REFRESH = "/auth/refresh" as const;
-export const AUTH_ME = "/auth/me" as const;
-export const AUTH_FORGOT_PASSWORD = "/auth/forgot-password" as const;
-export const AUTH_RESET_PASSWORD = "/auth/reset-password" as const;
+const base = {
+  auth: "/auth",
+  students: "/students",
+  parents: "/parents",
+  campuses: "/campuses",
+  rooms: "/rooms",
+  courses: "/courses",
+  classes: "/classes",
+  enrollments: "/enrollments",
+  attendance: "/attendance",
+  tuition: "/tuition",
+  employees: "/employees",
+  roles: "/roles",
+  permissions: "/permissions",
+  notifications: "/notifications",
+  payroll: "/payroll",
+} as const;
 
-// ── Users / Roles ──────────────────────────────────
-export const USERS = "/users" as const;
-export const ROLES = "/roles" as const;
-export const PERMISSIONS = "/permissions" as const;
+export const API_ENDPOINTS = {
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  auth: {
+    login: `${base.auth}/login`,
+    logout: `${base.auth}/logout`,
+    refresh: `${base.auth}/refresh`,
+    me: `${base.auth}/me`,
+    forgotPassword: `${base.auth}/forgot-password`,
+    resetPassword: `${base.auth}/reset-password`,
+    changePassword: `${base.auth}/change-password`,
+  },
 
-// ── Employees ─────────────────────────────────────
-export const EMPLOYEES = "/employees" as const;
-export const EMPLOYEE_BY_ID = (id: string) => `/employees/${id}` as const;
+  // ── Students ──────────────────────────────────────────────────────────────
+  students: {
+    list: base.students,
+    create: base.students,
+    detail: (id: string) => `${base.students}/${id}`,
+    update: (id: string) => `${base.students}/${id}`,
+    delete: (id: string) => `${base.students}/${id}`,
+    parents: (id: string) => `${base.students}/${id}/parents`,
+    enrollments: (id: string) => `${base.students}/${id}/enrollments`,
+    attendance: (id: string) => `${base.students}/${id}/attendance`,
+    scores: (id: string) => `${base.students}/${id}/scores`,
+    tuition: (id: string) => `${base.students}/${id}/tuition`,
+  },
 
-// ── Students ──────────────────────────────────────
-export const STUDENTS = "/students" as const;
-export const STUDENT_BY_ID = (id: string) => `/students/${id}` as const;
+  // ── Parents ───────────────────────────────────────────────────────────────
+  parents: {
+    list: base.parents,
+    create: base.parents,
+    detail: (id: string) => `${base.parents}/${id}`,
+    update: (id: string) => `${base.parents}/${id}`,
+    delete: (id: string) => `${base.parents}/${id}`,
+    children: (id: string) => `${base.parents}/${id}/children`,
+    createAccount: (id: string) => `${base.parents}/${id}/account`,
+  },
 
-// ── Parents ───────────────────────────────────────
-export const PARENTS = "/parents" as const;
-export const PARENT_BY_ID = (id: string) => `/parents/${id}` as const;
+  // ── Campuses ──────────────────────────────────────────────────────────────
+  campuses: {
+    list: base.campuses,
+    create: base.campuses,
+    detail: (id: string) => `${base.campuses}/${id}`,
+    update: (id: string) => `${base.campuses}/${id}`,
+    delete: (id: string) => `${base.campuses}/${id}`,
+  },
 
-// ── Campuses & Rooms ──────────────────────────────
-export const CAMPUSES = "/campuses" as const;
-export const CAMPUS_BY_ID = (id: string) => `/campuses/${id}` as const;
-export const ROOMS = "/rooms" as const;
-export const ROOM_BY_ID = (id: string) => `/rooms/${id}` as const;
+  // ── Rooms ─────────────────────────────────────────────────────────────────
+  rooms: {
+    list: base.rooms,
+    create: base.rooms,
+    detail: (id: string) => `${base.rooms}/${id}`,
+    update: (id: string) => `${base.rooms}/${id}`,
+    delete: (id: string) => `${base.rooms}/${id}`,
+    byCampus: (campusId: string) => `${base.campuses}/${campusId}/rooms`,
+  },
 
-// ── Courses / Curriculum ──────────────────────────
-export const COURSES = "/courses" as const;
-export const COURSE_BY_ID = (id: string) => `/courses/${id}` as const;
+  // ── Courses ───────────────────────────────────────────────────────────────
+  courses: {
+    list: base.courses,
+    create: base.courses,
+    detail: (id: string) => `${base.courses}/${id}`,
+    update: (id: string) => `${base.courses}/${id}`,
+    delete: (id: string) => `${base.courses}/${id}`,
+  },
 
-// ── Classes ───────────────────────────────────────
-export const CLASSES = "/classes" as const;
-export const CLASS_BY_ID = (id: string) => `/classes/${id}` as const;
+  // ── Classes ───────────────────────────────────────────────────────────────
+  classes: {
+    list: base.classes,
+    create: base.classes,
+    detail: (id: string) => `${base.classes}/${id}`,
+    update: (id: string) => `${base.classes}/${id}`,
+    delete: (id: string) => `${base.classes}/${id}`,
+    students: (id: string) => `${base.classes}/${id}/students`,
+    sessions: (id: string) => `${base.classes}/${id}/sessions`,
+    schedules: (id: string) => `${base.classes}/${id}/schedules`,
+  },
 
-// ── Schedules ─────────────────────────────────────
-export const SCHEDULES = "/schedules" as const;
-export const SCHEDULE_BY_ID = (id: string) => `/schedules/${id}` as const;
+  // ── Enrollments ───────────────────────────────────────────────────────────
+  enrollments: {
+    list: base.enrollments,
+    create: base.enrollments,
+    detail: (id: string) => `${base.enrollments}/${id}`,
+    update: (id: string) => `${base.enrollments}/${id}`,
+    transfer: (id: string) => `${base.enrollments}/${id}/transfer`,
+    freeze: (id: string) => `${base.enrollments}/${id}/freeze`,
+    unfreeze: (id: string) => `${base.enrollments}/${id}/unfreeze`,
+    withdraw: (id: string) => `${base.enrollments}/${id}/withdraw`,
+  },
 
-// ── Attendance ────────────────────────────────────
-export const ATTENDANCE = "/attendance" as const;
+  // ── Attendance ────────────────────────────────────────────────────────────
+  attendance: {
+    list: base.attendance,
+    bySession: (sessionId: string) =>
+      `${base.attendance}/sessions/${sessionId}`,
+    bulkMark: `${base.attendance}/bulk`,
+    update: (id: string) => `${base.attendance}/${id}`,
+  },
 
-// ── Tuition / Invoices ────────────────────────────
-export const INVOICES = "/invoices" as const;
-export const INVOICE_BY_ID = (id: string) => `/invoices/${id}` as const;
+  // ── Tuition ───────────────────────────────────────────────────────────────
+  tuition: {
+    invoices: base.tuition,
+    createInvoice: base.tuition,
+    invoiceDetail: (id: string) => `${base.tuition}/${id}`,
+    updateInvoice: (id: string) => `${base.tuition}/${id}`,
+    addPayment: (id: string) => `${base.tuition}/${id}/payments`,
+    refund: (id: string) => `${base.tuition}/${id}/refund`,
+    payments: (id: string) => `${base.tuition}/${id}/payments`,
+  },
 
-// ── Payroll ───────────────────────────────────────
-export const PAYROLL = "/payroll" as const;
+  // ── Employees ─────────────────────────────────────────────────────────────
+  employees: {
+    list: base.employees,
+    create: base.employees,
+    detail: (id: string) => `${base.employees}/${id}`,
+    update: (id: string) => `${base.employees}/${id}`,
+    delete: (id: string) => `${base.employees}/${id}`,
+  },
 
-// ── Notifications ─────────────────────────────────
-export const NOTIFICATIONS = "/notifications" as const;
+  // ── Roles & Permissions ───────────────────────────────────────────────────
+  roles: {
+    list: base.roles,
+    create: base.roles,
+    detail: (id: string) => `${base.roles}/${id}`,
+    update: (id: string) => `${base.roles}/${id}`,
+    delete: (id: string) => `${base.roles}/${id}`,
+    permissions: (id: string) => `${base.roles}/${id}/permissions`,
+  },
+  permissions: {
+    list: base.permissions,
+  },
+
+  // ── Notifications ─────────────────────────────────────────────────────────
+  notifications: {
+    list: base.notifications,
+    markRead: (id: string) => `${base.notifications}/${id}/read`,
+    markAllRead: `${base.notifications}/read-all`,
+  },
+} as const;

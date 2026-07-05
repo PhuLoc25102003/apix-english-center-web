@@ -1,54 +1,60 @@
 /**
- * APIX API Response types — standard §9
+ * src/lib/api/api-response.ts
  *
- * All backend responses must conform to these shapes.
- * Feature API files and hooks should use these types to
- * ensure consistent error handling and data access patterns.
+ * Standard response envelope types used across all APIX API calls.
+ * Feature API files and hooks must use these types — never raw Axios types.
+ *
+ * Standard §9 contract shapes.
  */
 
+// ── Pagination ────────────────────────────────────────────────────────────────
+
 /**
- * Pagination metadata returned by list endpoints.
+ * Pagination metadata returned alongside list responses.
  */
 export type PageMeta = {
   /** Current page number (1-based) */
   page: number;
   /** Number of items per page */
   limit: number;
-  /** Total number of items across all pages */
+  /** Total items across all pages */
   total: number;
   /** Total number of pages */
   totalPages: number;
+  /** Whether a next page exists */
+  hasNextPage: boolean;
+  /** Whether a previous page exists */
+  hasPreviousPage: boolean;
 };
 
+// ── Success responses ─────────────────────────────────────────────────────────
+
 /**
- * Standard successful API response envelope.
+ * Standard single-item or action success response.
  *
  * @example
- * const res: ApiResponse<Student[]> = await apiClient.get('/students')
+ * // GET /students/:id
+ * const res: ApiResponse<Student> = await apiClient.get(...)
+ * res.data.fullName
  */
 export type ApiResponse<T> = {
   success: true;
   message: string;
   data: T;
-  meta?: PageMeta;
 };
 
 /**
- * Standard error API response envelope.
- * Returned by the backend on 4xx / 5xx.
+ * Paginated list response — wraps an array with pagination metadata.
+ *
+ * @example
+ * // GET /students?page=1&limit=20
+ * const res: PageResponse<Student> = await apiClient.get(...)
+ * res.data          // Student[]
+ * res.meta.total    // total count
  */
-export type ApiError = {
-  success: false;
-  errorCode: string;
+export type PageResponse<T> = {
+  success: true;
   message: string;
-  details?: Array<{
-    field?: string;
-    message: string;
-  }>;
+  data: T[];
+  meta: PageMeta;
 };
-
-/**
- * Union of success and error shapes — useful for discriminated unions
- * before unwrapping data.
- */
-export type ApiResult<T> = ApiResponse<T> | ApiError;

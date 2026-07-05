@@ -29,7 +29,7 @@ export default function HomePage() {
       </svg>
 
       {/* ── Glass card ── */}
-      <div className="glass relative z-10 mx-4 flex w-full max-w-md flex-col items-center gap-8 rounded-3xl px-10 py-12 shadow-2xl shadow-black/5">
+      <div className="glass-card relative z-10 mx-4 flex w-full max-w-md flex-col items-center gap-8 px-10 py-12 shadow-2xl shadow-black/5">
         {/* Logo mark */}
         <div className="flex flex-col items-center gap-4">
           <div

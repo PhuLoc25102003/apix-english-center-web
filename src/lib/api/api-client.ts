@@ -1,26 +1,34 @@
 /**
- * APIX API Client — standard §9
+ * src/lib/api/api-client.ts
  *
- * Single Axios instance for all API calls.
+ * Single Axios instance for all APIX API calls.
+ *
  * Rules:
- *  - Never call axios directly in UI components or hooks.
- *  - All feature API files must import and use this client.
- *  - Token refresh is handled in the request interceptor.
- *  - 401 → refresh token or logout.
- *  - Tokens must never be logged.
+ *  - Never import this from UI components or hooks directly.
+ *  - All feature api files (features/xxx/api/xxx.api.ts) use this client.
+ *  - Token attachment is automatic via request interceptor.
+ *  - 401 handling triggers a silent token refresh via HTTP-only cookie.
+ *  - Tokens are NEVER logged.
  */
 
 import axios, {
   type AxiosError,
   type AxiosInstance,
   type InternalAxiosRequestConfig,
-} from "axios"
+} from "axios";
 
-import type { ApiError } from "./api-response"
+import {
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+} from "@/lib/auth/token-storage";
+import type { ApiErrorResponse } from "./api-error";
+import { API_ENDPOINTS } from "./endpoints";
 
-// ── Configuration ────────────────────────────────────────────────────────────
+// ── Base URL ─────────────────────────────────────────────────────────────────
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api";
 
 // ── Axios instance ────────────────────────────────────────────────────────────
 
@@ -30,104 +38,92 @@ const apiClient: AxiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  withCredentials: true, // send HTTP-only refresh token cookie
+  withCredentials: true, // send HTTP-only refresh token cookie on every request
   timeout: 15_000,
-})
+});
 
-// ── In-memory access token store ─────────────────────────────────────────────
-// Access tokens are stored in memory to reduce XSS risk.
-// Refresh tokens are stored in HTTP-only cookies by the backend.
-
-let _accessToken: string | null = null
-
-export function setAccessToken(token: string | null): void {
-  _accessToken = token
-}
-
-export function getAccessToken(): string | null {
-  return _accessToken
-}
-
-// ── Request interceptor — attach token ───────────────────────────────────────
+// ── Request interceptor — attach Bearer token ─────────────────────────────────
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (_accessToken) {
-      config.headers.Authorization = `Bearer ${_accessToken}`
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
-  (error: unknown) => Promise.reject(error)
-)
+  (error: unknown) => Promise.reject(error),
+);
 
-// ── Response interceptor — handle 401 ────────────────────────────────────────
+// ── Response interceptor — handle 401 with silent refresh ────────────────────
 
-let _isRefreshing = false
+let _isRefreshing = false;
 let _refreshQueue: Array<{
-  resolve: (token: string) => void
-  reject: (err: unknown) => void
-}> = []
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
 
 function processQueue(error: unknown, token: string | null = null): void {
   _refreshQueue.forEach(({ resolve, reject }) => {
     if (error) {
-      reject(error)
+      reject(error);
     } else if (token) {
-      resolve(token)
+      resolve(token);
     }
-  })
-  _refreshQueue = []
+  });
+  _refreshQueue = [];
 }
 
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError<ApiError>) => {
+  async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean
-    }
+      _retry?: boolean;
+    };
 
-    // Only attempt token refresh on 401 and if we haven't retried already
+    // Silent token refresh on 401 (first attempt only)
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (_isRefreshing) {
-        // Queue this request until the refresh completes
+        // Queue concurrent requests until refresh resolves
         return new Promise<string>((resolve, reject) => {
-          _refreshQueue.push({ resolve, reject })
+          _refreshQueue.push({ resolve, reject });
         }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`
-          return apiClient(originalRequest)
-        })
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
+        });
       }
 
-      originalRequest._retry = true
-      _isRefreshing = true
+      originalRequest._retry = true;
+      _isRefreshing = true;
 
       try {
-        // Call refresh endpoint — server reads the HTTP-only cookie
+        // Backend reads the HTTP-only refresh token cookie
         const { data } = await apiClient.post<{ accessToken: string }>(
-          "/auth/refresh"
-        )
+          API_ENDPOINTS.auth.refresh,
+        );
 
-        const newToken = data.accessToken
-        setAccessToken(newToken)
-        processQueue(null, newToken)
+        const newToken = data.accessToken;
+        setAccessToken(newToken);
+        processQueue(null, newToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newToken}`
-        return apiClient(originalRequest)
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return apiClient(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError)
-        setAccessToken(null)
-        // Redirect to login — handled by the auth feature
+        processQueue(refreshError);
+        clearAccessToken();
+
+        // Redirect to login — navigate client-side only
         if (typeof window !== "undefined") {
-          window.location.href = "/login"
+          window.location.href = "/login";
         }
-        return Promise.reject(refreshError)
+        return Promise.reject(refreshError);
       } finally {
-        _isRefreshing = false
+        _isRefreshing = false;
       }
     }
 
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
-export { apiClient }
+export { apiClient };

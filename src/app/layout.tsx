@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
-import { AppProviders } from "@/providers";
+import { AppProvider } from "@/providers";
 
 /* ── APIX Typography ──────────────────────────
    Body:    Inter
@@ -48,7 +48,7 @@ export default function RootLayout({
       className={`${inter.variable} ${plusJakartaSans.variable}`}
     >
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

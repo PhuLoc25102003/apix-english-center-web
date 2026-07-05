@@ -23,7 +23,7 @@
   --color-apix-red: var(--apix-red);
   --color-apix-red-dark: var(--apix-red-dark);
   --color-apix-red-soft: var(--apix-red-soft);
-  --color-glass-white: var(--glass-white);
+  --color-glass-background: var(--glass-background);
   --color-glass-border: var(--glass-border);
 
   /* Shadcn token bridge */
@@ -80,8 +80,11 @@
   --apix-red-soft: #ffe8ea;
   --apix-ink: #111827;
   --apix-muted-ink: #6b7280;
-  --glass-white: rgba(255, 255, 255, 0.72);
+  
+  /* Glassmorphism system tokens */
+  --glass-background: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(255, 255, 255, 0.42);
+  
   --apix-success: #16a34a;
   --apix-warning: #f59e0b;
   --apix-danger: #dc2626;
@@ -166,7 +169,7 @@
   --sidebar-ring: #ff161a;
 
   /* Glass overrides for dark */
-  --glass-white: rgba(20, 20, 20, 0.72);
+  --glass-background: rgba(20, 20, 20, 0.72);
   --glass-border: rgba(255, 255, 255, 0.10);
 }
 
@@ -200,22 +203,38 @@
    APIX Utility Classes
 ───────────────────────────────────────────── */
 @layer utilities {
-  /* Liquid glass surface */
-  .glass {
-    background: var(--glass-white);
+  /* Liquid glass utility classes */
+  .glass-card {
+    background: var(--glass-background);
     backdrop-filter: blur(20px) saturate(1.8);
     -webkit-backdrop-filter: blur(20px) saturate(1.8);
     border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
+    border-radius: var(--radius-xl);
+  }
+
+  .glass-sidebar {
+    background: var(--glass-background);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    border-right: 1px solid var(--glass-border);
+  }
+
+  .glass-header {
+    background: var(--glass-background);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  /* APIX Brand Gradients */
+  .apix-gradient {
+    background: linear-gradient(135deg, #ff161a 0%, #c90012 60%, #8b000a 100%);
   }
 
   /* APIX display font */
   .font-display {
     font-family: var(--font-display);
-  }
-
-  /* Red gradient background used on login / accents */
-  .bg-apix-gradient {
-    background: linear-gradient(135deg, #ff161a 0%, #c90012 60%, #8b000a 100%);
   }
 
   /* Learning Arc SVG accent */
