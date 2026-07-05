@@ -10,3 +10,6 @@ export * from "./components/student-filters";
 export * from "./components/student-list-container";
 export * from "./components/student-form";
 export * from "./schemas/student.schema";
+export * from "./components/student-create-container";
+export * from "./components/student-edit-container";
+export * from "./components/student-detail-container";
