@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { ClassTuitionSection } from "@/features/tuition";
 import { useClass } from "../hooks/use-class";
 import { useClassEnrollments } from "../hooks/use-class-enrollments";
 import { classStatusLabels, formatClassDate } from "./class-table";
@@ -245,11 +246,7 @@ export function ClassDetailContainer({ id }: ClassDetailContainerProps) {
 
       {activeTab === "tuition" && (
         <section id="class-panel-tuition" role="tabpanel">
-          <EmptyState
-            icon={<CreditCard className="h-8 w-8" />}
-            title="Chưa có dữ liệu học phí"
-            description="Thông tin học phí của lớp sẽ xuất hiện tại đây khi API học phí theo lớp được kết nối."
-          />
+          <ClassTuitionSection classId={id} />
         </section>
       )}
     </div>

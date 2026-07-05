@@ -45,4 +45,10 @@ export type ActiveStatus = "ACTIVE" | "INACTIVE";
 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "DRAFT";
 
-export type PaymentStatus = "PAID" | "UNPAID" | "OVERDUE";
+export type PaymentStatus =
+  | "UNPAID"
+  | "PARTIALLY_PAID"
+  | "PAID"
+  | "OVERDUE"
+  | "CANCELLED"
+  | "REFUNDED";

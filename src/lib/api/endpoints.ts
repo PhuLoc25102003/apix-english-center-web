@@ -26,7 +26,8 @@ const base = {
   classes: "/classes",
   enrollments: "/enrollments",
   attendance: "/attendance",
-  tuition: "/tuition",
+  invoices: "/invoices",
+  tuitionPackages: "/tuition-packages",
   employees: "/employees",
   roles: "/roles",
   permissions: "/permissions",
@@ -144,13 +145,14 @@ export const API_ENDPOINTS = {
 
   // ── Tuition ───────────────────────────────────────────────────────────────
   tuition: {
-    invoices: base.tuition,
-    createInvoice: base.tuition,
-    invoiceDetail: (id: string) => `${base.tuition}/${id}`,
-    updateInvoice: (id: string) => `${base.tuition}/${id}`,
-    addPayment: (id: string) => `${base.tuition}/${id}/payments`,
-    refund: (id: string) => `${base.tuition}/${id}/refund`,
-    payments: (id: string) => `${base.tuition}/${id}/payments`,
+    invoices: base.invoices,
+    createInvoice: base.invoices,
+    byStudent: (studentId: string) => `/students/${studentId}/invoices`,
+    byClass: (classId: string) => `/classes/${classId}/invoices`,
+    addPayment: (id: string) => `${base.invoices}/${id}/payments`,
+    payments: (id: string) => `${base.invoices}/${id}/payments`,
+    packages: base.tuitionPackages,
+    packageDetail: (id: string) => `${base.tuitionPackages}/${id}`,
   },
 
   // ── Employees ─────────────────────────────────────────────────────────────

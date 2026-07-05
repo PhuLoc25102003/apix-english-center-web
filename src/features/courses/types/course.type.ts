@@ -13,7 +13,7 @@ export interface Course {
   description: string | null;
   totalLessons: number;
   durationMinutes: number;
-  defaultTuitionFee: number;
+  defaultMonthlyTuitionFee: number;
   status: CourseStatus;
 }
 
@@ -24,7 +24,7 @@ export interface CreateCourseDto {
   description: string | null;
   totalLessons: number;
   durationMinutes: number;
-  defaultTuitionFee: number;
+  defaultMonthlyTuitionFee: number;
   status: CourseStatus;
 }
 

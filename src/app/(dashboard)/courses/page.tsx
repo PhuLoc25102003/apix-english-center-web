@@ -101,7 +101,7 @@ export default function CoursesPage() {
       description: values.description?.trim() || null,
       totalLessons: values.totalLessons,
       durationMinutes: values.durationMinutes,
-      defaultTuitionFee: values.defaultTuitionFee,
+      defaultMonthlyTuitionFee: values.defaultMonthlyTuitionFee,
       status: values.status,
     };
 

@@ -64,7 +64,7 @@ export function CourseTable({ courses, onEdit, onDeleted }: CourseTableProps) {
               <TableHead className="h-12 min-w-56 font-semibold text-slate-600">Mô tả</TableHead>
               <TableHead className="h-12 text-center font-semibold text-slate-600">Số buổi</TableHead>
               <TableHead className="h-12 text-center font-semibold text-slate-600">Thời lượng</TableHead>
-              <TableHead className="h-12 text-right font-semibold text-slate-600">Học phí</TableHead>
+              <TableHead className="h-12 text-right font-semibold text-slate-600">Học phí/tháng</TableHead>
               <TableHead className="h-12 font-semibold text-slate-600">Trạng thái</TableHead>
               <TableHead className="h-12 w-20">
                 <span className="sr-only">Thao tác</span>
@@ -99,7 +99,7 @@ export function CourseTable({ courses, onEdit, onDeleted }: CourseTableProps) {
                   {course.durationMinutes} phút
                 </TableCell>
                 <TableCell className="text-right font-semibold whitespace-nowrap tabular-nums text-slate-800">
-                  {formatVnd(course.defaultTuitionFee)}
+                  {formatVnd(course.defaultMonthlyTuitionFee)}
                 </TableCell>
                 <TableCell>
                   <StatusBadge

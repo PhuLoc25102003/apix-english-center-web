@@ -1020,16 +1020,60 @@ Attendance page must support:
 
 ### 14.5 Tuition
 
+#### Monthly billing model
+
+Tuition is paid by month or by a configured group of months. The frontend must
+never present a course as a fixed full-course billing package.
+
+- Course lesson count and class start/end dates are academic planning estimates.
+  They must not be used to calculate a student's tuition debt or billing end.
+- A class may continue beyond its expected end date. Monthly billing continues
+  only through explicit invoice periods, never automatically through course or
+  class completion.
+- If Course Management exposes a fee, the field must be named and described as
+  `defaultMonthlyTuitionFee` / "monthly tuition reference". It is not a total
+  course price.
+- Tuition debt is the sum of remaining balances on monthly invoices with
+  UNPAID, PARTIALLY_PAID, or OVERDUE status.
+- Payment history is a separate append-only view from invoice/billing records.
+
 Tuition pages must support:
 
-- Invoice list
-- Invoice detail
-- Create invoice
-- Add payment
-- Refund workflow
-- Overdue status
-- Reminder status
-- Payment history
+- Invoice list and detail by monthly billing period
+- Create invoice through the reusable CRUD modal form system
+- Student, class/enrollment, billing start month, and number-of-months selection
+- Configured packages such as one month or three months in advance
+- Percentage-based and fixed-amount discounts
+- Full and partial payments
+- UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED, and REFUNDED states
+- Refund workflow, reminders, and separate payment history
+- Filters by campus, class, student, billing month, status, and payment period
+- Server-side pagination and total count after filters are applied
+
+The invoice form must preview:
+
+```text
+Monthly fee
+Number of months
+Subtotal = monthly fee * number of months
+Package or promotion discount
+Final amount = subtotal - discount
+Paid amount
+Remaining amount = final amount - paid amount
+```
+
+Selecting a three-month package must clearly show its configured advance-payment
+discount. The UI must not hard-code the discount percentage; package data comes
+from the API.
+
+All money fields use localized formatting for display and input, but form state
+and API payloads remain numeric. Never send formatted strings such as
+`1,000,000` or `1.000.000` when the backend expects a number.
+
+Class Detail and Student Detail must show tuition status by billing month or
+inclusive month range. Class Detail shows invoices for students in that class;
+Student Detail shows the student's monthly invoice and payment history across
+classes.
 
 ### 14.6 Contact logs
 

@@ -26,6 +26,7 @@ import { studentFormConfig } from "../configs/student-form.config";
 import { studentSchema } from "../schemas/student.schema";
 import { useUpdateStudent } from "../hooks/use-update-student";
 import { useConfirm } from "@/hooks/use-confirm";
+import { StudentTuitionSection } from "@/features/tuition";
 
 interface StudentDetailContainerProps {
   id: string;
@@ -211,6 +212,10 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
       {/* Linked Parents Relationship Section */}
       <div className="mt-4">
         <StudentParentSection studentId={student.id} />
+      </div>
+
+      <div className="mt-4">
+        <StudentTuitionSection studentId={student.id} />
       </div>
 
       {/* Reusable form modal */}

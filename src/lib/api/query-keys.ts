@@ -94,6 +94,7 @@ export const classKeys = {
   detail: (id: string) => [...classKeys.all, "detail", id] as const,
   students: (id: string) => [...classKeys.all, "detail", id, "students"] as const,
   sessions: (id: string) => [...classKeys.all, "detail", id, "sessions"] as const,
+  tuition: (id: string) => [...classKeys.all, "detail", id, "tuition"] as const,
 };
 
 // ── Enrollments ───────────────────────────────────────────────────────────────
@@ -127,6 +128,7 @@ export const tuitionKeys = {
   detail: (id: string) => [...tuitionKeys.all, "detail", id] as const,
   payments: (id: string) =>
     [...tuitionKeys.all, "detail", id, "payments"] as const,
+  packages: () => [...tuitionKeys.all, "packages"] as const,
 };
 
 // ── Auth ──────────────────────────────────────────────────────────────────────

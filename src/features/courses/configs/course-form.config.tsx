@@ -90,15 +90,15 @@ export function createCourseFormConfig(
       icon: <Clock3 className="h-4 w-4" />,
     },
     {
-      name: "defaultTuitionFee",
-      label: "Học phí mặc định",
+      name: "defaultMonthlyTuitionFee",
+      label: "Học phí tháng tham khảo",
       type: "custom",
       required: true,
       colSpan: 2,
       icon: <Banknote className="h-4 w-4" />,
       customRender: ({ field, error, disabled }) => (
         <MoneyInput
-          id="defaultTuitionFee"
+          id="defaultMonthlyTuitionFee"
           value={field.value}
           onChange={field.onChange}
           placeholder="Ví dụ: 3.500.000"

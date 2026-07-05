@@ -23,9 +23,9 @@ export const courseSchema = z.object({
     .number({ error: "Thời lượng là bắt buộc." })
     .int("Thời lượng phải là số nguyên.")
     .min(1, "Thời lượng phải lớn hơn 0."),
-  defaultTuitionFee: z
-    .number({ error: "Học phí mặc định là bắt buộc." })
-    .min(0, "Học phí mặc định không được âm."),
+  defaultMonthlyTuitionFee: z
+    .number({ error: "Học phí tháng tham khảo là bắt buộc." })
+    .min(0, "Học phí tháng tham khảo không được âm."),
   status: z.enum(courseStatuses, { error: "Vui lòng chọn trạng thái." }),
 });
 
