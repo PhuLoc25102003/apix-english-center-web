@@ -744,6 +744,30 @@ PermissionGate
 ConfirmDialog
 ```
 
+### 12.1.1 Global Confirmation System (`useConfirm`)
+
+To avoid duplicating dialog open states and rendering local JSX in multiple components, trigger confirmations programmatically using the global `useConfirm` hook:
+
+```tsx
+import { useConfirm } from "@/hooks/use-confirm";
+
+const confirm = useConfirm();
+
+const handleAction = async () => {
+  const isConfirmed = await confirm({
+    title: "Xác nhận hành động",
+    description: "Bạn có chắc chắn muốn thực hiện hành động này không?",
+    confirmLabel: "Xác nhận",
+    cancelLabel: "Hủy",
+    variant: "default", // or "destructive"
+  });
+
+  if (isConfirmed) {
+    // Execute action
+  }
+};
+```
+
 ### 12.2 Data table
 
 Every list page should share the same table system.

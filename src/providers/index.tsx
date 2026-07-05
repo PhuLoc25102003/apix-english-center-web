@@ -6,3 +6,5 @@
  */
 export { AppProvider } from "./app-provider";
 export { QueryProvider } from "./query-provider";
+export { ConfirmProvider } from "./confirm-provider";
+

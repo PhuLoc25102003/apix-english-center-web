@@ -18,6 +18,7 @@ import { ErrorState } from "@/components/feedback/error-state";
 import { StudentForm } from "./student-form";
 import { useStudent } from "../hooks/use-student";
 import { useUpdateStudent } from "../hooks/use-update-student";
+import { useConfirm } from "@/hooks/use-confirm";
 import type { StudentFormValues } from "../schemas/student.schema";
 
 interface StudentEditContainerProps {
@@ -28,16 +29,27 @@ export function StudentEditContainer({ id }: StudentEditContainerProps) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch, isRefetching } = useStudent(id);
   const updateMutation = useUpdateStudent();
+  const confirm = useConfirm();
 
-  const handleSubmit = (values: StudentFormValues) => {
-    updateMutation.mutate(
-      { id, data: values },
-      {
-        onSuccess: () => {
-          router.push("/students");
-        },
-      }
-    );
+  const handleSubmit = async (values: StudentFormValues) => {
+    const ok = await confirm({
+      title: "Xác nhận cập nhật",
+      description: `Bạn có chắc chắn muốn lưu các thay đổi cho học viên ${data?.data?.fullName || ""}?`,
+      confirmLabel: "Cập nhật",
+      cancelLabel: "Hủy",
+      variant: "default",
+    });
+
+    if (ok) {
+      updateMutation.mutate(
+        { id, data: values },
+        {
+          onSuccess: () => {
+            router.push("/students");
+          },
+        }
+      );
+    }
   };
 
   if (isLoading) {

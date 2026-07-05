@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteParent } from "../hooks/use-delete-parent";
 import type { Parent } from "../types/parent.type";
 
@@ -36,19 +36,9 @@ interface ParentTableProps {
 }
 
 export function ParentTable({ parents }: ParentTableProps) {
-  const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const deleteMutation = useDeleteParent();
   const router = useRouter();
-
-  const handleDelete = () => {
-    if (!deleteId) return;
-
-    deleteMutation.mutate(deleteId, {
-      onSuccess: () => {
-        setDeleteId(null);
-      },
-    });
-  };
+  const confirm = useConfirm();
 
   return (
     <>
@@ -106,7 +96,18 @@ export function ParentTable({ parents }: ParentTableProps) {
                           <span>Chỉnh sửa</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => setDeleteId(parent.id)}
+                          onClick={async () => {
+                            const ok = await confirm({
+                              title: "Xác nhận xóa phụ huynh",
+                              description: `Bạn có chắc chắn muốn xóa hồ sơ phụ huynh ${parent.fullName}? Hành động này không thể hoàn tác.`,
+                              confirmLabel: "Xóa",
+                              cancelLabel: "Hủy",
+                              variant: "destructive",
+                            });
+                            if (ok) {
+                              deleteMutation.mutate(parent.id);
+                            }
+                          }}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Trash2 className="h-4 w-4 text-rose-400" />
@@ -121,18 +122,6 @@ export function ParentTable({ parents }: ParentTableProps) {
           </Table>
         </div>
       </div>
-
-      <ConfirmDialog
-        open={!!deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Xác nhận xóa phụ huynh"
-        description="Bạn có chắc chắn muốn xóa hồ sơ phụ huynh này? Hành động này không thể hoàn tác."
-        confirmLabel="Xóa"
-        cancelLabel="Hủy"
-        variant="destructive"
-        isConfirming={deleteMutation.isPending}
-        onConfirm={handleDelete}
-      />
     </>
   );
 }

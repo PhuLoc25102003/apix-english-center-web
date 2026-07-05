@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { ErrorState } from "@/components/feedback/error-state";
-import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 
 import { useParents } from "@/features/parents/hooks/use-parents";
 import { useStudentParents } from "../hooks/use-student-parents";
@@ -58,8 +58,8 @@ interface StudentParentSectionProps {
 
 export function StudentParentSection({ studentId }: StudentParentSectionProps) {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = React.useState(false);
-  const [unlinkParentId, setUnlinkParentId] = React.useState<string | null>(null);
   const [parentSearch, setParentSearch] = React.useState("");
+  const confirm = useConfirm();
 
   // Queries & Mutations
   const { data: linkedData, isLoading, isError, error, refetch } = useStudentParents(studentId);
@@ -116,15 +116,7 @@ export function StudentParentSection({ studentId }: StudentParentSectionProps) {
     });
   };
 
-  const handleUnlink = () => {
-    if (!unlinkParentId) return;
 
-    unlinkMutation.mutate(unlinkParentId, {
-      onSuccess: () => {
-        setUnlinkParentId(null);
-      },
-    });
-  };
 
   const getRelationshipLabel = (rel: string) => {
     const labels: Record<string, string> = {
@@ -200,7 +192,18 @@ export function StudentParentSection({ studentId }: StudentParentSectionProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setUnlinkParentId(relation.id)}
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: "Gỡ liên kết phụ huynh",
+                      description: `Bạn có chắc muốn gỡ liên kết phụ huynh ${relation.fullName} ra khỏi hồ sơ học viên? Hồ sơ phụ huynh trong hệ thống vẫn sẽ được giữ lại.`,
+                      confirmLabel: "Hủy liên kết",
+                      cancelLabel: "Hủy",
+                      variant: "destructive",
+                    });
+                    if (ok) {
+                      unlinkMutation.mutate(relation.id);
+                    }
+                  }}
                   className="h-8 w-8 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
                   title="Hủy liên kết"
                 >
@@ -438,19 +441,6 @@ export function StudentParentSection({ studentId }: StudentParentSectionProps) {
           </form>
         </DialogContent>
       </Dialog>
-
-      {/* Unlink Confirmation */}
-      <ConfirmDialog
-        open={!!unlinkParentId}
-        onOpenChange={(open) => !open && setUnlinkParentId(null)}
-        title="Gỡ liên kết phụ huynh"
-        description="Bạn có chắc muốn gỡ liên kết phụ huynh này ra khỏi hồ sơ học viên? Hồ sơ phụ huynh trong hệ thống vẫn sẽ được giữ lại."
-        confirmLabel="Hủy liên kết"
-        cancelLabel="Hủy"
-        variant="destructive"
-        isConfirming={unlinkMutation.isPending}
-        onConfirm={handleUnlink}
-      />
     </div>
   );
 }

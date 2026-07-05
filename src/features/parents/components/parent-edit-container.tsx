@@ -17,6 +17,7 @@ import { ErrorState } from "@/components/feedback/error-state";
 import { ParentForm } from "./parent-form";
 import { useParent } from "../hooks/use-parent";
 import { useUpdateParent } from "../hooks/use-update-parent";
+import { useConfirm } from "@/hooks/use-confirm";
 import type { ParentFormValues } from "../schemas/parent.schema";
 
 interface ParentEditContainerProps {
@@ -27,16 +28,27 @@ export function ParentEditContainer({ id }: ParentEditContainerProps) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch, isRefetching } = useParent(id);
   const updateMutation = useUpdateParent();
+  const confirm = useConfirm();
 
-  const handleSubmit = (values: ParentFormValues) => {
-    updateMutation.mutate(
-      { id, data: values },
-      {
-        onSuccess: () => {
-          router.push("/parents");
-        },
-      }
-    );
+  const handleSubmit = async (values: ParentFormValues) => {
+    const ok = await confirm({
+      title: "Xác nhận cập nhật",
+      description: `Bạn có chắc chắn muốn lưu các thay đổi cho phụ huynh ${data?.data?.fullName || ""}?`,
+      confirmLabel: "Cập nhật",
+      cancelLabel: "Hủy",
+      variant: "default",
+    });
+
+    if (ok) {
+      updateMutation.mutate(
+        { id, data: values },
+        {
+          onSuccess: () => {
+            router.push("/parents");
+          },
+        }
+      );
+    }
   };
 
   if (isLoading) {

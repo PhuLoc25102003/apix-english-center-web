@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/common/status-badge";
-import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteStudent } from "../hooks/use-delete-student";
 import type { Student, StudentType, AccessMode } from "../types/student.type";
 
@@ -36,19 +36,9 @@ interface StudentTableProps {
 }
 
 export function StudentTable({ students }: StudentTableProps) {
-  const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const deleteMutation = useDeleteStudent();
   const router = useRouter();
-
-  const handleDelete = () => {
-    if (!deleteId) return;
-
-    deleteMutation.mutate(deleteId, {
-      onSuccess: () => {
-        setDeleteId(null);
-      },
-    });
-  };
+  const confirm = useConfirm();
 
   // Helper translations for display
   const getStudentTypeLabel = (type: StudentType) => {
@@ -149,7 +139,18 @@ export function StudentTable({ students }: StudentTableProps) {
                           <span>Chỉnh sửa</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => setDeleteId(student.id)}
+                          onClick={async () => {
+                            const ok = await confirm({
+                              title: "Xác nhận xóa học viên",
+                              description: `Bạn có chắc chắn muốn xóa học viên ${student.fullName}? Hành động này không thể hoàn tác.`,
+                              confirmLabel: "Xóa",
+                              cancelLabel: "Hủy",
+                              variant: "destructive",
+                            });
+                            if (ok) {
+                              deleteMutation.mutate(student.id);
+                            }
+                          }}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Trash2 className="h-4 w-4 text-rose-400" />
@@ -164,18 +165,6 @@ export function StudentTable({ students }: StudentTableProps) {
           </Table>
         </div>
       </div>
-
-      <ConfirmDialog
-        open={!!deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Xác nhận xóa học viên"
-        description="Bạn có chắc chắn muốn xóa học viên này? Hành động này không thể hoàn tác."
-        confirmLabel="Xóa"
-        cancelLabel="Hủy"
-        variant="destructive"
-        isConfirming={deleteMutation.isPending}
-        onConfirm={handleDelete}
-      />
     </>
   );
 }

@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "./query-provider";
+import { ConfirmProvider } from "./confirm-provider";
 
 /**
  * AppProvider — root provider tree for APIX English Center.
@@ -31,7 +32,9 @@ type AppProviderProps = {
 export function AppProvider({ children }: AppProviderProps) {
   return (
     <ThemeProvider>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryProvider>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </QueryProvider>
     </ThemeProvider>
   );
 }
