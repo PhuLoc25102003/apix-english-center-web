@@ -12,3 +12,10 @@ export * from "./components/parent-create-container";
 export * from "./components/parent-edit-container";
 export * from "./components/parent-detail-container";
 export * from "./schemas/parent.schema";
+export * from "./types/parent-child.type";
+export * from "./api/parent-child.api";
+export * from "./hooks/use-parent-children";
+export * from "./hooks/use-link-parent-student";
+export * from "./hooks/use-unlink-parent-student";
+export * from "./components/parent-children-section";
+

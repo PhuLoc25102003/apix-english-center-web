@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { useParent } from "../hooks/use-parent";
+import { ParentChildrenSection } from "./parent-children-section";
 
 interface ParentDetailContainerProps {
   id: string;
@@ -158,6 +159,11 @@ export function ParentDetailContainer({ id }: ParentDetailContainerProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Linked Children Section */}
+      <div className="mt-4">
+        <ParentChildrenSection parentId={parent.id} />
       </div>
     </div>
   );

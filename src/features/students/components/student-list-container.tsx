@@ -9,6 +9,7 @@
 
 import * as React from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/common/page-header";
@@ -22,6 +23,7 @@ import { StudentFilters } from "./student-filters";
 import { StudentTable } from "./student-table";
 
 export function StudentListContainer() {
+  const router = useRouter();
   const [search, setSearch] = React.useState("");
   const [studentType, setStudentType] = React.useState("");
   const [accessMode, setAccessMode] = React.useState("");
@@ -58,8 +60,8 @@ export function StudentListContainer() {
         description="Tra cứu danh sách học viên, theo dõi trạng thái học tập và thông tin kết nối tài khoản."
         action={
           <Button
-            onClick={() => toast.info("Tính năng thêm học viên mới đang được phát triển")}
-            className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2"
+            onClick={() => router.push("/students/new")}
+            className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Thêm học viên

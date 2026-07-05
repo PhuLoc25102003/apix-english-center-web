@@ -9,6 +9,7 @@
 
 import * as React from "react";
 import { MoreVertical, Eye, Edit, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import {
@@ -37,6 +38,7 @@ interface StudentTableProps {
 export function StudentTable({ students }: StudentTableProps) {
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const deleteMutation = useDeleteStudent();
+  const router = useRouter();
 
   const handleDelete = () => {
     if (!deleteId) return;
@@ -133,14 +135,14 @@ export function StudentTable({ students }: StudentTableProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] glass-card p-1">
                         <DropdownMenuItem
-                          onClick={() => toast.info(`Xem chi tiết: ${student.fullName}`)}
+                          onClick={() => router.push(`/students/${student.id}`)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Eye className="h-4 w-4 text-slate-400" />
                           <span>Chi tiết</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => toast.info(`Chỉnh sửa: ${student.fullName}`)}
+                          onClick={() => router.push(`/students/${student.id}/edit`)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
                         >
                           <Edit className="h-4 w-4 text-slate-400" />
