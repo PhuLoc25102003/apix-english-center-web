@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { LoginForm } from "@/features/auth/components/login-form";
+
 export const metadata: Metadata = {
   title: "Login | APIX English Center",
   description: "Sign in to the APIX English Center Management System.",
@@ -7,21 +9,34 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#F8FAFC]">
-      {/* Background decoration */}
+    <main className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#F8FAFC] p-4">
+      {/* ── Background decoration ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 learning-arc"
       />
 
-      {/* Login glass card */}
-      <div className="glass-card relative z-10 w-full max-w-md p-8 shadow-2xl shadow-black/5">
-        <div className="flex flex-col items-center gap-4 text-center">
+      {/* ── Learning Arc SVG decoration ── */}
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 opacity-[0.05]"
+        width="900"
+        height="400"
+        viewBox="0 0 900 400"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <ellipse cx="450" cy="0" rx="450" ry="280" fill="#FF161A" />
+      </svg>
+
+      {/* ── Login Glass Card ── */}
+      <div className="glass-card relative z-10 w-full max-w-md px-8 py-10 shadow-2xl shadow-black/5">
+        <div className="flex flex-col items-center gap-4 text-center mb-8">
           {/* Logo mark */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-apix-gradient shadow-md shadow-[#FF161A]/20">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-apix-gradient shadow-lg shadow-[#FF161A]/20">
             <svg
-              width="24"
-              height="24"
+              width="30"
+              height="30"
               viewBox="0 0 44 44"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -36,68 +51,32 @@ export default function LoginPage() {
             </svg>
           </div>
 
-          <div>
+          <div className="flex flex-col gap-1">
             <h1 className="font-display text-2xl font-bold tracking-tight text-[#111827]">
-              Welcome Back
+              Welcome back
             </h1>
-            <p className="mt-1 text-sm text-[#6B7280]">
+            <p className="text-sm text-[#6B7280]">
               Sign in to manage your English center
             </p>
           </div>
         </div>
 
-        {/* Form placeholder */}
-        <div className="mt-8 flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="username"
-              className="text-xs font-semibold uppercase tracking-wider text-[#4B5563]"
-            >
-              Email or Username
-            </label>
-            <input
-              id="username"
-              type="text"
-              placeholder="name@apix.edu.vn"
-              disabled
-              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus:border-[#FF161A] focus:outline-none focus:ring-2 focus:ring-[#FF161A]/20 disabled:cursor-not-allowed disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF]"
-            />
-          </div>
+        {/* ── Login Form ── */}
+        <LoginForm />
 
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="text-xs font-semibold uppercase tracking-wider text-[#4B5563]"
-              >
-                Password
-              </label>
-              <span className="text-xs text-[#C90012] hover:underline cursor-pointer">
-                Forgot password?
-              </span>
-            </div>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              disabled
-              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus:border-[#FF161A] focus:outline-none focus:ring-2 focus:ring-[#FF161A]/20 disabled:cursor-not-allowed disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF]"
-            />
-          </div>
-
-          <button
-            type="button"
-            disabled
-            className="mt-2 w-full rounded-lg bg-[#FF161A] py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#FF161A]/20 hover:bg-[#C90012] disabled:cursor-not-allowed disabled:bg-[#9CA3AF]"
-          >
-            Sign In
-          </button>
-        </div>
-
-        <div className="mt-6 text-center text-xs text-[#6B7280]">
-          Auth flow implementation is coming in Phase 2
+        {/* ── Form Hint / Help ── */}
+        <div className="mt-8 rounded-lg border border-[#FF161A]/10 bg-[#FFE8EA]/40 p-3 text-center text-xs text-[#C90012]">
+          <span className="font-semibold block mb-0.5">Demo Credentials</span>
+          Email: <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#FF161A]/10 select-all">admin@apix.edu.vn</code>
+          <br />
+          Password: <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#FF161A]/10 select-all">apix1234</code>
         </div>
       </div>
+
+      {/* ── Footer ── */}
+      <p className="relative z-10 mt-8 text-xs text-[#9CA3AF]">
+        © {new Date().getFullYear()} APIX English Center. All rights reserved.
+      </p>
     </main>
   );
 }
