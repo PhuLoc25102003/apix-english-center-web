@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/api";
+import { setCurrentUser } from "@/lib/auth/current-user-storage";
 import { setAccessToken } from "@/lib/auth/token-storage";
 import { loginRequest } from "@/features/auth/api/auth.api";
 import type { AuthResponse, LoginCredentials } from "@/features/auth/types/auth.type";
@@ -29,6 +30,11 @@ export function useLogin() {
 
     onSuccess: (data) => {
       setAccessToken(data.accessToken);
+      setCurrentUser({
+        ...data.user,
+        roles: data.roles,
+        permissions: data.permissions,
+      });
       toast.success(`Chào mừng trở lại, ${data.user.fullName}!`);
       router.push("/dashboard");
     },

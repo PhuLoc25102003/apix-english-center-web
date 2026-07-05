@@ -63,7 +63,8 @@ apiClient.interceptors.response.use(
 
     const isAuthRequest =
       originalRequest.url === API_ENDPOINTS.auth.login ||
-      originalRequest.url === API_ENDPOINTS.auth.refresh;
+      originalRequest.url === API_ENDPOINTS.auth.refresh ||
+      originalRequest.url === API_ENDPOINTS.auth.logout;
 
     if (error.response?.status === 401 && !isAuthRequest) {
       clearAccessToken();

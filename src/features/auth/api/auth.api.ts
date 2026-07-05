@@ -22,3 +22,24 @@ export async function loginRequest(
     throw parseApiError(error);
   }
 }
+
+/** Restores an authenticated session from the backend HTTP-only cookie. */
+export async function refreshSessionRequest(): Promise<AuthResponse> {
+  try {
+    const { data } = await apiClient.post<ApiResponse<AuthResponse>>(
+      API_ENDPOINTS.auth.refresh,
+    );
+    return data.data;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+/** Clears the backend refresh cookie. Local auth state is cleared by the caller. */
+export async function logoutRequest(): Promise<void> {
+  try {
+    await apiClient.post(API_ENDPOINTS.auth.logout);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}

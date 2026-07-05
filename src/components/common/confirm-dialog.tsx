@@ -68,7 +68,7 @@ export function ConfirmDialog({
             disabled={isConfirming}
             className="w-full sm:w-auto font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] disabled:bg-[#9CA3AF]"
           >
-            {isConfirming ? "Processing..." : confirmLabel}
+            {isConfirming ? "Đang xử lý..." : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

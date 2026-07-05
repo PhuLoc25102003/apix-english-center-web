@@ -13,7 +13,7 @@ export type LoginCredentials = z.infer<typeof loginSchema>;
  */
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
   tokenType: string;
   expiresIn: number;
   user: {
