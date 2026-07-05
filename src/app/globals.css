@@ -1,0 +1,225 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* ─────────────────────────────────────────────
+   Google Fonts — APIX Typography
+   Display: Plus Jakarta Sans  |  Body: Inter
+───────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────
+   Tailwind Theme Bridge
+───────────────────────────────────────────── */
+@theme inline {
+  /* Fonts */
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* APIX Brand Colors */
+  --color-apix-red: var(--apix-red);
+  --color-apix-red-dark: var(--apix-red-dark);
+  --color-apix-red-soft: var(--apix-red-soft);
+  --color-glass-white: var(--glass-white);
+  --color-glass-border: var(--glass-border);
+
+  /* Shadcn token bridge */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* Border radius scale */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ─────────────────────────────────────────────
+   CSS Custom Properties — Light Mode
+   APIX Brand: #FF161A red on white
+───────────────────────────────────────────── */
+:root {
+  /* ── APIX Brand ── */
+  --apix-red: #ff161a;
+  --apix-red-dark: #c90012;
+  --apix-red-soft: #ffe8ea;
+  --apix-ink: #111827;
+  --apix-muted-ink: #6b7280;
+  --glass-white: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.42);
+  --apix-success: #16a34a;
+  --apix-warning: #f59e0b;
+  --apix-danger: #dc2626;
+
+  /* ── Shadcn semantic tokens (APIX-tuned) ── */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.11 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.11 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.11 0 0);
+
+  /* Primary = APIX red */
+  --primary: #ff161a;
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.11 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: #ffe8ea;
+  --accent-foreground: #c90012;
+  --destructive: #dc2626;
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: #ff161a;
+
+  /* Charts */
+  --chart-1: #ff161a;
+  --chart-2: #f59e0b;
+  --chart-3: #16a34a;
+  --chart-4: #3b82f6;
+  --chart-5: #8b5cf6;
+
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.11 0 0);
+  --sidebar-primary: #ff161a;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: #ffe8ea;
+  --sidebar-accent-foreground: #c90012;
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: #ff161a;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+.dark {
+  --background: oklch(0.10 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: #ff161a;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.20 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: rgba(255, 22, 26, 0.15);
+  --accent-foreground: #ff6b6e;
+  --destructive: #ef4444;
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #ff161a;
+  --chart-1: #ff4d50;
+  --chart-2: #fbbf24;
+  --chart-3: #34d399;
+  --chart-4: #60a5fa;
+  --chart-5: #a78bfa;
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #ff161a;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: rgba(255, 22, 26, 0.12);
+  --sidebar-accent-foreground: #ff6b6e;
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: #ff161a;
+
+  /* Glass overrides for dark */
+  --glass-white: rgba(20, 20, 20, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.10);
+}
+
+/* ─────────────────────────────────────────────
+   Base Styles
+───────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  html {
+    @apply font-sans scroll-smooth;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────
+   APIX Utility Classes
+───────────────────────────────────────────── */
+@layer utilities {
+  /* Liquid glass surface */
+  .glass {
+    background: var(--glass-white);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* APIX display font */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* Red gradient background used on login / accents */
+  .bg-apix-gradient {
+    background: linear-gradient(135deg, #ff161a 0%, #c90012 60%, #8b000a 100%);
+  }
+
+  /* Learning Arc SVG accent */
+  .learning-arc {
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 22, 26, 0.18) 0%, transparent 70%);
+  }
+}
