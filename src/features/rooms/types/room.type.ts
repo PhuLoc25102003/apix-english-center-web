@@ -1,3 +1,5 @@
+import type { ListParams } from "@/lib/api";
+
 export interface Room {
   id: string;
   campusId: string;
@@ -22,9 +24,6 @@ export interface CreateRoomDto {
 
 export type UpdateRoomDto = CreateRoomDto;
 
-export interface RoomListParams {
-  page?: number;
-  limit?: number;
-  search?: string;
+export type RoomListParams = ListParams & {
   campusId?: string;
-}
+};

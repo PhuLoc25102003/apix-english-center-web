@@ -1,23 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight, Plus, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 import { PageHeader } from "@/components/common/page-header";
-import { SearchInput } from "@/components/common/search-input";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useCampuses } from "@/features/campuses";
 import {
+  RoomFilters,
   RoomForm,
   RoomTable,
   useCreateRoom,
@@ -30,7 +23,6 @@ import {
 import { useConfirm } from "@/hooks/use-confirm";
 
 const PAGE_SIZE = 10;
-const ALL_CAMPUSES = "all";
 
 export default function RoomsPage() {
   const [search, setSearch] = React.useState("");
@@ -65,8 +57,8 @@ export default function RoomsPage() {
     setPage(1);
   }, []);
 
-  const handleCampusChange = (value: string | null) => {
-    setCampusId(value === ALL_CAMPUSES ? "" : value || "");
+  const handleCampusChange = (value: string) => {
+    setCampusId(value);
     setPage(1);
   };
 
@@ -146,42 +138,14 @@ export default function RoomsPage() {
         }
       />
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-white/40 bg-white/40 p-4 shadow-xs backdrop-blur-md sm:flex-row sm:items-center">
-        <SearchInput
-          placeholder="Tìm mã, tên hoặc loại phòng..."
-          value={search}
-          onChange={handleSearchChange}
-          className="w-full sm:max-w-sm"
-        />
-        <Select
-          value={campusId || ALL_CAMPUSES}
-          onValueChange={handleCampusChange}
-          disabled={campusesQuery.isLoading || campusesQuery.isError}
-        >
-          <SelectTrigger className="h-9 w-full bg-white/60 sm:w-64">
-            <SelectValue placeholder="Lọc theo cơ sở" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_CAMPUSES}>Tất cả cơ sở</SelectItem>
-            {campusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {hasFilters && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={clearFilters}
-            className="cursor-pointer gap-2 text-slate-600"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Xóa bộ lọc
-          </Button>
-        )}
-      </div>
+      <RoomFilters
+        search={search}
+        onSearchChange={handleSearchChange}
+        campusId={campusId}
+        onCampusChange={handleCampusChange}
+        campusOptions={campusOptions}
+        isLoadingCampuses={campusesQuery.isLoading || campusesQuery.isError}
+      />
 
       {isLoading ? (
         <LoadingState variant="table" />
@@ -208,7 +172,15 @@ export default function RoomsPage() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <RoomTable rooms={data.data} onEdit={handleEdit} />
+          <RoomTable
+            rooms={data.data}
+            onEdit={handleEdit}
+            onDeleted={() => {
+              if (data.data.length === 1 && page > 1) {
+                setPage((current) => current - 1);
+              }
+            }}
+          />
 
           <div className="mt-4 flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-slate-500">
@@ -254,10 +226,16 @@ export default function RoomsPage() {
       <RoomForm
         open={isModalOpen}
         onOpenChange={handleModalChange}
+        isEdit={Boolean(selectedRoomId)}
         room={selectedRoomId ? roomDetailQuery.data?.data : undefined}
-        campusOptions={campusOptions}
         onSubmit={handleFormSubmit}
         isLoadingDetails={Boolean(selectedRoomId) && roomDetailQuery.isLoading}
+        detailsError={
+          selectedRoomId && roomDetailQuery.isError
+            ? roomDetailQuery.error.message || "Không thể tải thông tin phòng học."
+            : undefined
+        }
+        onRetryDetails={() => void roomDetailQuery.refetch()}
       />
     </div>
   );

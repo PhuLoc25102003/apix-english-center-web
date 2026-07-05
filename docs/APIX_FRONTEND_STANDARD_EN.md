@@ -823,6 +823,58 @@ DataTable
   pagination
 ```
 
+#### 13.1.1 Reusable List Filter Bar Standard
+
+List-page filters must follow the visual and component structure established by
+`src/features/students/components/student-filters.tsx`.
+
+- Keep filters in a feature component named `<feature-name>-filters.tsx`; the page
+  or list container owns filter state and data fetching.
+- Use one liquid-glass filter bar with search on the left and a wrapping select
+  group on the right. Use the same responsive spacing, rounded corners, border,
+  translucent background, and compact 36px select triggers as `StudentFilters`.
+- Select triggers should include a short uppercase field prefix such as
+  `Campus:` or `Status:` followed by `SelectValue`.
+- Use a stable `ALL` sentinel in the UI and map it to an empty string or omitted
+  API parameter. Every filter change must reset pagination to page 1.
+- Async option lists must expose loading/disabled states and must never display
+  database identifiers to users.
+
+Base UI select label resolution is mandatory. Pass the same option array to the
+root `Select` through its `items` prop and render those options as `SelectItem`
+children. `SelectValue` uses `items` to resolve a selected value to its label;
+without it, dynamic values such as campus UUIDs may be displayed instead of the
+human-readable campus name.
+
+```tsx
+const campusItems = [
+  { value: "ALL", label: "All" },
+  ...campuses.map((campus) => ({ value: campus.id, label: campus.name })),
+];
+
+<Select
+  value={campusId || "ALL"}
+  onValueChange={(value) => setCampusId(value === "ALL" ? "" : value ?? "")}
+  items={campusItems}
+>
+  <SelectTrigger>
+    <span>Campus:</span>
+    <SelectValue placeholder="All" />
+  </SelectTrigger>
+  <SelectContent>
+    {campusItems.map((item) => (
+      <SelectItem key={item.value} value={item.value}>
+        {item.label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+```
+
+The same `items` rule applies to dynamic select fields rendered inside CRUD
+forms. Shared form renderers must forward `FormInputConfig.options` to the root
+`Select`, so edit forms show labels rather than stored IDs.
+
 ### 13.2 Detail page layout
 
 ```text

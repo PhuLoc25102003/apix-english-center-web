@@ -198,6 +198,7 @@ export function FormInputRenderer({
                       onValueChange={(val: string | null) =>
                         field.onChange(val || "")
                       }
+                      items={config.options}
                       disabled={isDisabled}
                     >
                       <SelectTrigger

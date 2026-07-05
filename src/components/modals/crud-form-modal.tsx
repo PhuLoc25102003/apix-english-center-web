@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FormInputConfig, FormInputRenderer } from "../forms/form-input-renderer";
 import { LoadingState } from "@/components/feedback/loading-state";
+import { ErrorState } from "@/components/feedback/error-state";
 
 interface CrudFormModalProps {
   open: boolean;
@@ -30,6 +31,8 @@ interface CrudFormModalProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (values: any) => Promise<void> | void;
   isLoadingDetails?: boolean; // When the detail API is fetching data
+  detailsError?: string;
+  onRetryDetails?: () => void;
 }
 
 export function CrudFormModal({
@@ -43,6 +46,8 @@ export function CrudFormModal({
   initialValues,
   onSubmit,
   isLoadingDetails = false,
+  detailsError,
+  onRetryDetails,
 }: CrudFormModalProps) {
   // Construct dynamic default values based on configs
   const defaultValues = React.useMemo(() => {
@@ -124,6 +129,12 @@ export function CrudFormModal({
           <div className="py-12">
             <LoadingState variant="spinner" className="min-h-[150px]" />
           </div>
+        ) : detailsError ? (
+          <ErrorState
+            title="Không thể tải dữ liệu"
+            message={detailsError}
+            onRetry={onRetryDetails}
+          />
         ) : (
           <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-6" noValidate>
             <div className="glass-card p-6 border border-white/40 shadow-xs rounded-2xl">

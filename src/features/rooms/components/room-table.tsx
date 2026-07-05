@@ -24,9 +24,10 @@ import type { Room } from "../types/room.type";
 interface RoomTableProps {
   rooms: Room[];
   onEdit: (id: string) => void;
+  onDeleted?: () => void;
 }
 
-export function RoomTable({ rooms, onEdit }: RoomTableProps) {
+export function RoomTable({ rooms, onEdit, onDeleted }: RoomTableProps) {
   const confirm = useConfirm();
   const deleteMutation = useDeleteRoom();
 
@@ -40,7 +41,7 @@ export function RoomTable({ rooms, onEdit }: RoomTableProps) {
     });
 
     if (confirmed) {
-      deleteMutation.mutate(room.id);
+      deleteMutation.mutate(room.id, { onSuccess: onDeleted });
     }
   };
 
