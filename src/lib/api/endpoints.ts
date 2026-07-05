@@ -38,7 +38,7 @@ export const API_ENDPOINTS = {
   auth: {
     login: `${base.auth}/login`,
     logout: `${base.auth}/logout`,
-    refresh: `${base.auth}/refresh`,
+    refresh: `${base.auth}/refresh-token`,
     me: `${base.auth}/me`,
     forgotPassword: `${base.auth}/forgot-password`,
     resetPassword: `${base.auth}/reset-password`,

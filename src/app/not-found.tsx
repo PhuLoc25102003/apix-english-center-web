@@ -22,10 +22,11 @@ export default function NotFound() {
           </p>
         </div>
         <Link
-          href="/"
+          href="/dashboard"
+          replace
           className="inline-flex items-center gap-2 rounded-xl bg-[#FF161A] px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-[#FF161A]/30 transition-all hover:bg-[#C90012] hover:shadow-md hover:shadow-[#C90012]/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF161A]"
         >
-          Go back home
+          Back to dashboard
         </Link>
       </div>
     </main>

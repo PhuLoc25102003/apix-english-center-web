@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -39,33 +40,20 @@ export function Sidebar() {
   return (
     <aside className="glass-sidebar fixed bottom-0 top-0 left-0 hidden w-64 flex-col p-6 lg:flex">
       {/* Brand logo & header */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-apix-gradient shadow-md shadow-[#FF161A]/10">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 44 44"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M22 4L40 38H4L22 4Z" fill="white" fillOpacity="0.95" />
-            <path
-              d="M14 28H30"
-              stroke="#FF161A"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-display text-sm font-bold tracking-tight text-[#111827]">
-            APIX
-          </span>
-          <span className="text-[10px] font-semibold tracking-wider text-[#6B7280] uppercase">
-            English Center
-          </span>
-        </div>
-      </div>
+      <Link
+        href="/dashboard"
+        aria-label="Go to dashboard"
+        className="flex w-full justify-center"
+      >
+        <Image
+          src="/branding/apix-english-logo-transparent.png"
+          alt="APIX English"
+          width={1812}
+          height={1376}
+          sizes="112px"
+          className="h-auto w-28 object-contain"
+        />
+      </Link>
 
       {/* Decorative gradient divider */}
       <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-[#FF161A]/10 to-transparent" />

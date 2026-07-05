@@ -13,11 +13,16 @@ export type LoginCredentials = z.infer<typeof loginSchema>;
  */
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
   user: {
     id: string;
     fullName: string;
     email: string;
-    roles: string[];
-    permissions: string[];
+    phone: string | null;
+    avatarUrl: string | null;
   };
+  roles: string[];
+  permissions: string[];
 }

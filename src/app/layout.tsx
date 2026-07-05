@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 import { AppProvider } from "@/providers";
@@ -49,6 +50,7 @@ export default function RootLayout({
     >
       <body>
         <AppProvider>{children}</AppProvider>
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );
