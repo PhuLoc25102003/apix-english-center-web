@@ -165,3 +165,33 @@ export const permissionKeys = {
   all: ["permissions"] as const,
   lists: () => [...permissionKeys.all, "list"] as const,
 };
+
+// ── Curriculums ─────────────────────────────────────────────────────────────
+
+export const curriculumKeys = {
+  all: ["curriculums"] as const,
+  lists: () => [...curriculumKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...curriculumKeys.lists(), filters] as const,
+  detail: (id: string) => [...curriculumKeys.all, "detail", id] as const,
+};
+
+// ── Positions ───────────────────────────────────────────────────────────────
+
+export const positionKeys = {
+  all: ["positions"] as const,
+  lists: () => [...positionKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...positionKeys.lists(), filters] as const,
+  detail: (id: string) => [...positionKeys.all, "detail", id] as const,
+};
+
+// ── Schedules ───────────────────────────────────────────────────────────────
+
+export const scheduleKeys = {
+  all: ["schedules"] as const,
+  lists: () => [...scheduleKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...scheduleKeys.lists(), filters] as const,
+  detail: (id: string) => [...scheduleKeys.all, "detail", id] as const,
+};

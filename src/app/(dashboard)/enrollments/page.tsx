@@ -10,131 +10,106 @@ import { LoadingState } from "@/components/feedback/loading-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { CrudFormModal } from "@/components/modals/crud-form-modal";
-import { useConfirm } from "@/hooks/use-confirm";
 import { hasPermission } from "@/lib/permissions/has-permission";
 
-import { useCourses } from "@/features/courses/hooks/use-courses";
+import { useClasses } from "@/features/classes/hooks/use-classes";
+import { useStudents } from "@/features/students/hooks/use-students";
 import {
-  useCurriculums,
-  useCurriculum,
-  useCreateCurriculum,
-  useUpdateCurriculum,
-  CurriculumTable,
-  createCurriculumFormConfig,
-  curriculumSchema,
-  type CurriculumFormValues,
-} from "@/features/curriculums";
+  useEnrollments,
+  useCreateEnrollment,
+  EnrollmentTable,
+  createEnrollmentFormConfig,
+  enrollmentSchema,
+  type CreateEnrollmentDto,
+} from "@/features/enrollments";
 
-export default function CurriculumsPage() {
+export default function EnrollmentsPage() {
   const [search, setSearch] = React.useState("");
-  const [courseId, setCourseId] = React.useState("");
+  const [classId, setClassId] = React.useState("");
   const [page, setPage] = React.useState(1);
   const limit = 10;
 
-  // Modal form states
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedCurriculumId, setSelectedCurriculumId] = React.useState<string | null>(null);
 
-  const { data: coursesData } = useCourses({ limit: 1000 });
+  // Fetch classes and students for selects and filter dropdowns
+  const { data: classesData } = useClasses({ limit: 1000 });
+  const { data: studentsData } = useStudents({ limit: 1000 });
 
-  const { data, isLoading, isError, error, refetch, isRefetching } = useCurriculums({
+  const { data, isLoading, isError, error, refetch, isRefetching } = useEnrollments({
     page,
     limit,
     search: search || undefined,
-    courseId: courseId || undefined,
+    classId: classId || undefined,
   });
 
-  const { data: curriculumDetail, isLoading: isLoadingDetail } = useCurriculum(
-    selectedCurriculumId || ""
-  );
-
-  const createMutation = useCreateCurriculum();
-  const updateMutation = useUpdateCurriculum();
-  const confirm = useConfirm();
+  const createMutation = useCreateEnrollment();
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
     setPage(1);
   };
 
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCourseId(e.target.value);
+  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setClassId(e.target.value);
     setPage(1);
   };
 
   const handleClearFilters = () => {
     setSearch("");
-    setCourseId("");
+    setClassId("");
     setPage(1);
   };
 
   const handleCreate = () => {
-    setSelectedCurriculumId(null);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (id: string) => {
-    setSelectedCurriculumId(id);
-    setIsModalOpen(true);
-  };
-
-  const handleFormSubmit = async (values: CurriculumFormValues) => {
-    const payload = {
-      courseId: values.courseId,
-      name: values.name.trim(),
-      versionName: values.versionName.trim(),
-      description: values.description ? values.description.trim() : null,
-      isActive: values.isActive,
+  const handleFormSubmit = async (values: any) => {
+    const payload: CreateEnrollmentDto = {
+      studentId: values.studentId,
+      classId: values.classId,
+      startDate: values.startDate,
+      endDate: values.endDate || null,
+      source: values.source,
+      note: values.note || null,
     };
 
-    if (selectedCurriculumId) {
-      const ok = await confirm({
-        title: "Xác nhận cập nhật",
-        description: `Bạn có chắc chắn muốn lưu các thay đổi cho giáo trình ${curriculumDetail?.data?.name || ""}?`,
-        confirmLabel: "Cập nhật",
-        cancelLabel: "Hủy",
-        variant: "default",
-      });
-      if (ok) {
-        await updateMutation.mutateAsync(
-          { id: selectedCurriculumId, data: payload },
-          {
-            onSuccess: () => {
-              setIsModalOpen(false);
-              setSelectedCurriculumId(null);
-            },
-          }
-        );
-      }
-    } else {
-      await createMutation.mutateAsync(payload, {
-        onSuccess: () => {
-          setIsModalOpen(false);
-        },
-      });
-    }
+    await createMutation.mutateAsync(payload, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+      },
+    });
   };
 
-  const courseOptions = React.useMemo(() => {
+  const studentOptions = React.useMemo(() => {
     return (
-      coursesData?.data.map((c) => ({
-        value: c.id,
-        label: `${c.code} - ${c.name}`,
+      studentsData?.data.map((student) => ({
+        value: student.id,
+        label: `${student.studentCode} - ${student.fullName}`,
       })) || []
     );
-  }, [coursesData]);
+  }, [studentsData]);
+
+  const classOptions = React.useMemo(() => {
+    return (
+      classesData?.data.map((cls) => ({
+        value: cls.id,
+        label: `${cls.classCode} - ${cls.name}`,
+      })) || []
+    );
+  }, [classesData]);
 
   const formConfigs = React.useMemo(() => {
-    return createCurriculumFormConfig(courseOptions);
-  }, [courseOptions]);
+    return createEnrollmentFormConfig(studentOptions, classOptions);
+  }, [studentOptions, classOptions]);
 
-  const canCreate = hasPermission("curriculum:create");
+  const canCreate = hasPermission("enrollment:create");
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Quản lý Giáo trình (Curriculums)"
-        description="Quản lý cấu trúc bài giảng, giáo án chi tiết và tài liệu học tập của các khóa học tại trung tâm."
+        title="Quản lý Ghi danh (Enrollments)"
+        description="Quản lý hồ sơ đăng ký ghi danh, học thử, tạm dừng và chuyển đổi lớp học của học viên."
         action={
           canCreate ? (
             <Button
@@ -142,7 +117,7 @@ export default function CurriculumsPage() {
               className="font-semibold bg-[#FF161A] text-white hover:bg-[#C90012] px-4 py-2 rounded-xl shadow-md shadow-[#FF161A]/15 transition-all inline-flex items-center gap-2 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
-              Tạo giáo trình
+              Ghi danh học viên
             </Button>
           ) : null
         }
@@ -151,19 +126,19 @@ export default function CurriculumsPage() {
       <div className="flex flex-wrap gap-4 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-xs items-center justify-between">
         <div className="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
           <SearchInput
-            placeholder="Tìm tên giáo trình..."
+            placeholder="Tìm kiếm mã, học viên..."
             value={search}
             onChange={handleSearchChange}
             className="w-full sm:max-w-xs"
           />
 
           <select
-            value={courseId}
-            onChange={handleCourseChange}
+            value={classId}
+            onChange={handleClassChange}
             className="h-10 rounded-xl bg-white/60 focus:bg-white border border-slate-200 text-xs font-semibold px-3 text-slate-700 outline-none cursor-pointer min-w-[200px]"
           >
-            <option value="">Tất cả khóa học</option>
-            {courseOptions.map((opt) => (
+            <option value="">Tất cả lớp học</option>
+            {classOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -171,7 +146,7 @@ export default function CurriculumsPage() {
           </select>
         </div>
 
-        {(search || courseId) && (
+        {(search || classId) && (
           <Button
             onClick={handleClearFilters}
             variant="ghost"
@@ -186,31 +161,31 @@ export default function CurriculumsPage() {
         <LoadingState variant="table" />
       ) : isError ? (
         <ErrorState
-          title="Không thể tải danh sách giáo trình"
+          title="Không thể tải danh sách ghi danh"
           message={error?.message || "Đã xảy ra lỗi khi tải danh sách."}
           onRetry={refetch}
           isRetrying={isRefetching}
         />
       ) : !data || data.data.length === 0 ? (
         <EmptyState
-          title="Không tìm thấy giáo trình nào"
+          title="Không tìm thấy bản ghi danh nào"
           description={
-            search || courseId
-              ? "Không tìm thấy kết quả khớp với bộ lọc hiện tại."
-              : "Hệ thống chưa có giáo trình nào."
+            search || classId
+              ? "Không có dữ liệu khớp với bộ lọc hiện tại. Hãy thử lại."
+              : "Hệ thống chưa có dữ liệu ghi danh học viên."
           }
-          actionLabel={search || courseId ? "Xóa bộ lọc" : undefined}
-          onAction={search || courseId ? handleClearFilters : undefined}
+          actionLabel={search || classId ? "Xóa bộ lọc" : undefined}
+          onAction={search || classId ? handleClearFilters : undefined}
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <CurriculumTable curriculums={data.data} onEdit={handleEdit} />
+          <EnrollmentTable enrollments={data.data} />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 px-2">
             <p className="text-sm text-slate-500">
               Hiển thị {data.data.length > 0 ? (page - 1) * limit + 1 : 0} -{" "}
-              {Math.min(page * limit, data.meta.total)} trong tổng số {data.meta.total} giáo trình
+              {Math.min(page * limit, data.meta.total)} trong tổng số {data.meta.total} ghi danh
             </p>
             {data.meta.totalPages > 1 && (
               <div className="flex items-center gap-2">
@@ -243,25 +218,16 @@ export default function CurriculumsPage() {
         </div>
       )}
 
-      {/* Crud modal form */}
+      {/* Ghi danh modal form */}
       <CrudFormModal
         open={isModalOpen}
-        onOpenChange={(open) => {
-          setIsModalOpen(open);
-          if (!open) setSelectedCurriculumId(null);
-        }}
-        title={selectedCurriculumId ? "Chỉnh sửa giáo trình" : "Tạo giáo trình mới"}
-        description={
-          selectedCurriculumId
-            ? "Cập nhật thông tin chi tiết giáo trình."
-            : "Nhập thông tin chi tiết giáo trình mới để tích hợp với giáo án các bài học."
-        }
-        submitLabel={selectedCurriculumId ? "Lưu thay đổi" : "Tạo giáo trình"}
+        onOpenChange={setIsModalOpen}
+        title="Ghi danh học viên mới"
+        description="Đăng ký cho học viên ghi danh vào lớp học chính thức hoặc học thử."
+        submitLabel="Ghi danh học"
         configs={formConfigs}
-        validationSchema={curriculumSchema}
-        initialValues={selectedCurriculumId ? curriculumDetail?.data : undefined}
+        validationSchema={enrollmentSchema}
         onSubmit={handleFormSubmit}
-        isLoadingDetails={selectedCurriculumId ? isLoadingDetail : false}
       />
     </div>
   );

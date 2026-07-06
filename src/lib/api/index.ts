@@ -35,6 +35,9 @@ export {
   employeeKeys,
   roleKeys,
   permissionKeys,
+  curriculumKeys,
+  positionKeys,
+  scheduleKeys,
 } from "./query-keys";
 
 // CRUD factory

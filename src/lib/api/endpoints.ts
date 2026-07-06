@@ -33,6 +33,9 @@ const base = {
   permissions: "/permissions",
   notifications: "/notifications",
   payroll: "/payroll",
+  curriculums: "/curriculums",
+  positions: "/positions",
+  schedules: "/class-schedules",
 } as const;
 
 export const API_ENDPOINTS = {
@@ -182,5 +185,32 @@ export const API_ENDPOINTS = {
     list: base.notifications,
     markRead: (id: string) => `${base.notifications}/${id}/read`,
     markAllRead: `${base.notifications}/read-all`,
+  },
+
+  // ── Curriculums ───────────────────────────────────────────────────────────
+  curriculums: {
+    list: base.curriculums,
+    create: base.curriculums,
+    detail: (id: string) => `${base.curriculums}/${id}`,
+    update: (id: string) => `${base.curriculums}/${id}`,
+    delete: (id: string) => `${base.curriculums}/${id}`,
+  },
+
+  // ── Positions ─────────────────────────────────────────────────────────────
+  positions: {
+    list: base.positions,
+    create: base.positions,
+    detail: (id: string) => `${base.positions}/${id}`,
+    update: (id: string) => `${base.positions}/${id}`,
+    delete: (id: string) => `${base.positions}/${id}`,
+  },
+
+  // ── Schedules ─────────────────────────────────────────────────────────────
+  schedules: {
+    list: base.schedules,
+    create: base.schedules,
+    detail: (id: string) => `${base.schedules}/${id}`,
+    update: (id: string) => `${base.schedules}/${id}`,
+    delete: (id: string) => `${base.schedules}/${id}`,
   },
 } as const;
