@@ -20,6 +20,7 @@ export const statusBadgeThemes = {
   REFUNDED: "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",
   APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
   REJECTED: "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",
+  LOCKED: "bg-red-50 text-red-700 border-red-200/60 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30",
 } as const;
 
 export type StatusType = keyof typeof statusBadgeThemes;
@@ -59,7 +60,7 @@ export function StatusBadge({
               ? "bg-emerald-500"
               : normalizedStatus === "PENDING"
               ? "bg-amber-500"
-              : normalizedStatus === "OVERDUE" || normalizedStatus === "UNPAID" || normalizedStatus === "REJECTED"
+              : normalizedStatus === "OVERDUE" || normalizedStatus === "UNPAID" || normalizedStatus === "REJECTED" || normalizedStatus === "LOCKED"
               ? "bg-rose-500"
               : "bg-slate-400"
           )}

@@ -36,6 +36,7 @@ const base = {
   curriculums: "/curriculums",
   positions: "/positions",
   schedules: "/class-schedules",
+  users: "/users",
 } as const;
 
 export const API_ENDPOINTS = {
@@ -82,6 +83,7 @@ export const API_ENDPOINTS = {
     detail: (id: string) => `${base.campuses}/${id}`,
     update: (id: string) => `${base.campuses}/${id}`,
     delete: (id: string) => `${base.campuses}/${id}`,
+    lookup: `${base.campuses}/lookup`,
   },
 
   // ── Rooms ─────────────────────────────────────────────────────────────────
@@ -175,10 +177,32 @@ export const API_ENDPOINTS = {
     update: (id: string) => `${base.roles}/${id}`,
     delete: (id: string) => `${base.roles}/${id}`,
     permissions: (id: string) => `${base.roles}/${id}/permissions`,
+    removePermission: (id: string, permissionId: string) => `${base.roles}/${id}/permissions/${permissionId}`,
+    lookup: `${base.roles}/lookup`,
   },
   permissions: {
     list: base.permissions,
+    detail: (id: string) => `${base.permissions}/${id}`,
+    create: base.permissions,
+    update: (id: string) => `${base.permissions}/${id}`,
+    delete: (id: string) => `${base.permissions}/${id}`,
+    lookup: `${base.permissions}/lookup`,
   },
+  users: {
+    list: base.users,
+    create: base.users,
+    detail: (id: string) => `${base.users}/${id}`,
+    update: (id: string) => `${base.users}/${id}`,
+    delete: (id: string) => `${base.users}/${id}`,
+    deactivate: (id: string) => `${base.users}/${id}/deactivate`,
+    lock: (id: string) => `${base.users}/${id}/lock`,
+    unlock: (id: string) => `${base.users}/${id}/unlock`,
+    roles: (id: string) => `${base.users}/${id}/roles`,
+    removeRole: (id: string, roleId: string) => `${base.users}/${id}/roles/${roleId}`,
+    resetPassword: (id: string) => `${base.users}/${id}/reset-password`,
+    lookup: `${base.users}/lookup`,
+  },
+
 
   // ── Notifications ─────────────────────────────────────────────────────────
   notifications: {

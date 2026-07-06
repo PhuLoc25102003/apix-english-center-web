@@ -149,6 +149,17 @@ export const employeeKeys = {
   detail: (id: string) => [...employeeKeys.all, "detail", id] as const,
 };
 
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+export const userKeys = {
+  all: ["users"] as const,
+  lists: () => [...userKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...userKeys.lists(), filters] as const,
+  detail: (id: string) => [...userKeys.all, "detail", id] as const,
+  roles: (id: string) => [...userKeys.all, "detail", id, "roles"] as const,
+};
+
 // ── Roles & Permissions ───────────────────────────────────────────────────────
 
 export const roleKeys = {
@@ -164,6 +175,8 @@ export const roleKeys = {
 export const permissionKeys = {
   all: ["permissions"] as const,
   lists: () => [...permissionKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...permissionKeys.lists(), filters] as const,
 };
 
 // ── Curriculums ─────────────────────────────────────────────────────────────
