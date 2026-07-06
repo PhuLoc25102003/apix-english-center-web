@@ -745,28 +745,44 @@ Manager/HR can:
 Routes:
 
 ```text
-/media
-/media/[id]
-/classes/[id]/media
-/students/[id]/media
+/media/videos
+/media/videos/upload
+/media/videos/[id]
+/upload/video/[uploadToken]
+/classes/[id]/videos
+/students/[id]/videos (if permission allows)
 ```
 
-Media categories:
+#### 6.8.1 QR Video Upload UX Flow
+1. **Initiate**: Desktop user selects class, student, video type, and target month, then clicks "Upload bằng điện thoại" (or "QR Upload Video").
+2. **Session Creation**: Backend creates an upload session and returns a session token and QR payload.
+3. **Display QR**: Desktop displays a QR code containing the mobile upload URL `/upload/video/[uploadToken]`.
+4. **Scan & Open**: Mobile user scans the QR and opens the public upload page.
+5. **Select Video**: Mobile page displays details (student, class, month) and prompts user to choose a video from camera/gallery.
+6. **Direct Upload**: Mobile uploads file directly to object storage via a presigned URL, showing real-time upload progress.
+7. **Complete**: Mobile calls complete-upload API. Desktop polls the session status and automatically updates the UI.
+8. **Review & Deliver**: Office Staff reviews the video, approves/rejects, generates a share link, copies the prepared Manual Zalo message, opens Zalo via `https://zalo.me/{phoneNumber}`, sends it manually, and marks it as sent.
 
-- Final course video.
-- Foreign teacher class activity.
-- Monthly personal video.
-- Other.
+#### 6.8.2 Component Architecture (src/features/media-videos)
+- **VideoListContainer**: Coordinates listing, filtering, and review workflows.
+- **VideoTable**: Tabular metadata view (title, status, size, actions).
+- **VideoFilters**: Filter criteria (class, student, status, type, month).
+- **CreateVideoUploadSessionModal**: Form to trigger a new QR session.
+- **VideoUploadQrDialog**: Renders QR, countdown timer, and runs status polling.
+- **MobileVideoUploadPage**: Responsive, clean, and simple mobile-first page.
+- **VideoReviewPanel**: Admin video player and metadata approval tool.
+- **VideoPreviewCard**: Liquid glass layout for video playback.
+- **VideoStatusBadge**: Color-coded badges for status transitions.
+- **VideoShareLinkPanel**: Panel for generating and revoking share links.
+- **ManualZaloVideoDeliveryPanel**: Semi-automated Zalo copy-message and status-tracking panel.
 
-UI rules:
+#### 6.8.3 UX & Security Rules
+- **No Heavy Desktop Uploads**: Desktop should prompt "Upload bằng điện thoại" as primary action.
+- **Mobile Simplicity**: Touch-optimized interface with large buttons. Cannot change student/class inputs. No parent private data exposed.
+- **Security Check**: Session tokens must expire. Show expired/invalid session states. Validate file size and MIME type.
+- **No Direct Storage Exposure**: Do not expose internal storage bucket keys in the UI.
+- **Manual Zalo Delivery**: Copy to clipboard -> open link `https://zalo.me/{phone}` -> mark as sent.
 
-- Upload through pre-signed URL or backend upload adapter.
-- Show upload progress.
-- Store metadata in backend.
-- Preview video if possible.
-- Publish/deliver to parent/student.
-- Do not send heavy video directly through web server.
-- Zalo integration later should send a notification/link, not duplicate heavy files.
 
 ### 6.9 Audit log page
 

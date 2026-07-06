@@ -237,4 +237,20 @@ export const API_ENDPOINTS = {
     update: (id: string) => `${base.schedules}/${id}`,
     delete: (id: string) => `${base.schedules}/${id}`,
   },
+
+  // ── Media Videos ──────────────────────────────────────────────────────────
+  mediaVideos: {
+    list: "/media/videos",
+    detail: (id: string) => `/media/videos/${id}`,
+    approve: (id: string) => `/media/videos/${id}/approve`,
+    reject: (id: string) => `/media/videos/${id}/reject`,
+    shareLinks: (id: string) => `/media/videos/${id}/share-links`,
+    revokeShareLink: (id: string) => `/media/videos/share-links/${id}/revoke`,
+    manualZaloMessage: (id: string) => `/media/videos/${id}/manual-zalo-message`,
+    uploadSessions: "/media/videos/upload-sessions",
+    uploadSessionDetail: (token: string) => `/media/videos/upload-sessions/${token}`,
+    presign: (token: string) => `/media/videos/upload-sessions/${token}/presign`,
+    complete: (token: string) => `/media/videos/upload-sessions/${token}/complete`,
+    deliveryStatus: (id: string) => `/notification-deliveries/${id}/status`,
+  },
 } as const;

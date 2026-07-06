@@ -41,6 +41,7 @@ import { hasPermission } from "@/lib/permissions/has-permission";
 import { useClass } from "../hooks/use-class";
 import { useClassEnrollments } from "../hooks/use-class-enrollments";
 import { classStatusLabels, formatClassDate } from "./class-table";
+import { VideoListContainer } from "@/features/media-videos";
 
 interface ClassDetailContainerProps {
   id: string;
@@ -387,13 +388,11 @@ export function ClassDetailContainer({ id, initialTab = "overview" }: ClassDetai
 
       {activeTab === "videos" && (
         <section className="glass-card p-6 border border-white/60 bg-white/40 rounded-2xl backdrop-blur-md">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-slate-800 text-sm">Thư viện Video hoạt động lớp học</h4>
-            <Button size="sm" className="bg-[#FF161A] text-white hover:bg-[#C90012] cursor-pointer rounded-xl">
-              Tải lên Video hoạt động
-            </Button>
-          </div>
-          <EmptyState icon={<Video className="h-8 w-8" />} title="Không tìm thấy video nào của lớp học" />
+          <VideoListContainer
+            initialClassId={id}
+            title="Thư viện Video lớp học (Media Library)"
+            description={`Tổng hợp các video đánh giá cá nhân và video hoạt động lớp học của lớp ${classItem.classCode || classItem.name}`}
+          />
         </section>
       )}
 

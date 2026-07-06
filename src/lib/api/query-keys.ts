@@ -208,3 +208,17 @@ export const scheduleKeys = {
     [...scheduleKeys.lists(), filters] as const,
   detail: (id: string) => [...scheduleKeys.all, "detail", id] as const,
 };
+
+// ── Media Videos ──────────────────────────────────────────────────────────────
+
+export const mediaVideoKeys = {
+  all: ["mediaVideos"] as const,
+  lists: () => [...mediaVideoKeys.all, "list"] as const,
+  list: (filters: Record<string, unknown>) =>
+    [...mediaVideoKeys.lists(), filters] as const,
+  detail: (id: string) => [...mediaVideoKeys.all, "detail", id] as const,
+  uploadSession: (token: string) => [...mediaVideoKeys.all, "uploadSession", token] as const,
+  shareLinks: (videoId: string) => [...mediaVideoKeys.all, "detail", videoId, "shareLinks"] as const,
+  deliveries: (videoId: string) => [...mediaVideoKeys.all, "detail", videoId, "deliveries"] as const,
+};
+

@@ -96,7 +96,7 @@ export const sidebarNavGroups: SidebarGroup[] = [
       { title: "Scores", href: "/scores", icon: Award, permission: "score:read" },
       { title: "Learning Reports", href: "/learning-reports", icon: FileSpreadsheet, permission: "learning-report:read" },
       { title: "Learning Report Review", href: "/learning-reports/review", icon: CheckSquare, permission: "learning-report:approve" },
-      { title: "Videos / Media", href: "/media/videos", icon: Video, permission: "media:read" },
+      { title: "Videos / Media", href: "/media/videos", icon: Video, permission: "media-video:read" },
     ],
   },
   {
