@@ -4,7 +4,8 @@ import type { FormInputConfig, InputOption } from "@/components/forms/form-input
 
 export function createEnrollmentFormConfig(
   studentOptions: InputOption[],
-  classOptions: InputOption[]
+  classOptions: InputOption[],
+  isEditing = false,
 ): FormInputConfig[] {
   return [
     {
@@ -19,6 +20,7 @@ export function createEnrollmentFormConfig(
       placeholder: "Chọn học viên",
       type: "select",
       required: true,
+      disabled: isEditing,
       options: studentOptions,
       colSpan: 2,
       icon: <User className="h-4 w-4" />,
@@ -29,6 +31,7 @@ export function createEnrollmentFormConfig(
       placeholder: "Chọn lớp học",
       type: "select",
       required: true,
+      disabled: isEditing,
       options: classOptions,
       colSpan: 2,
       icon: <GraduationCap className="h-4 w-4" />,

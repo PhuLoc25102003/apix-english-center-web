@@ -7,7 +7,6 @@ import type { ApiError, ApiResponse } from "@/lib/api";
 
 export function useCreateEnrollment() {
   const queryClient = useQueryClient();
-
   return useMutation<ApiResponse<Enrollment>, ApiError, CreateEnrollmentDto>({
     mutationFn: (data) => enrollmentApi.create(data),
     onSuccess: (response) => {
@@ -15,7 +14,8 @@ export function useCreateEnrollment() {
       toast.success(response.message || "Ghi danh học viên thành công!");
     },
     onError: (error) => {
-      toast.error(error.message || "Đã xảy ra lỗi khi ghi danh học viên.");
+      const fieldMessage = error.details.find((detail) => detail.message)?.message;
+      toast.error(fieldMessage || error.message || "Không thể ghi danh học viên.");
     },
   });
 }

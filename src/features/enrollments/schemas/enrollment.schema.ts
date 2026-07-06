@@ -8,9 +8,10 @@ export const enrollmentSchema = z
     classId: z.string().uuid("Vui lòng chọn lớp học hợp lệ"),
     enrolledDate: z.string().regex(isoDate, "Ngày ghi danh phải có định dạng YYYY-MM-DD"),
     startDate: z.string().regex(isoDate, "Ngày bắt đầu phải có định dạng YYYY-MM-DD"),
-    endDate: z
-      .union([z.string().regex(isoDate, "Ngày kết thúc phải có định dạng YYYY-MM-DD"), z.null()])
-      .optional(),
+    endDate: z.preprocess(
+      (value) => (value === "" || value === undefined ? null : value),
+      z.union([z.string().regex(isoDate, "Ngày kết thúc phải có định dạng YYYY-MM-DD"), z.null()]),
+    ),
     status: z.enum(["TRIAL", "ACTIVE", "FROZEN", "TRANSFERRED", "COMPLETED", "CANCELLED"]),
     source: z.enum(["WALK_IN", "REFERRAL", "ONLINE", "OTHER"]),
     note: z.string().nullable().optional(),

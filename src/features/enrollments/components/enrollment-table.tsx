@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, CheckCircle, XCircle } from "lucide-react";
+import { MoreVertical, CheckCircle, XCircle, Pencil } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import type { Enrollment } from "../types/enrollment.type";
 
 interface EnrollmentTableProps {
   enrollments: Enrollment[];
+  onEdit: (enrollment: Enrollment) => void;
 }
 
 const statusLabels: Record<string, string> = {
@@ -51,13 +52,14 @@ const sourceLabels: Record<string, string> = {
   OTHER: "Nguồn khác",
 };
 
-export function EnrollmentTable({ enrollments }: EnrollmentTableProps) {
+export function EnrollmentTable({ enrollments, onEdit }: EnrollmentTableProps) {
   const cancelMutation = useCancelEnrollment();
   const completeMutation = useCompleteEnrollment();
   const confirm = useConfirm();
 
   const canCancel = hasPermission("enrollment:cancel");
   const canComplete = hasPermission("enrollment:complete");
+  const canEdit = hasPermission("enrollment:update");
 
   const formatLocalDate = (val: string | null) => {
     if (!val) return "-";
@@ -92,7 +94,7 @@ export function EnrollmentTable({ enrollments }: EnrollmentTableProps) {
                   {item.enrollmentCode || "-"}
                 </TableCell>
                 <TableCell className="font-semibold text-slate-900">
-                  {item.studentName}
+                  {item.studentFullName}
                 </TableCell>
                 <TableCell className="font-semibold text-slate-900">
                   <div className="flex flex-col">
@@ -125,7 +127,7 @@ export function EnrollmentTable({ enrollments }: EnrollmentTableProps) {
                 </TableCell>
                 <TableCell>
                   {/* Dropdown Menu actions */}
-                  {(canCancel || canComplete) &&
+                  {(canEdit || canCancel || canComplete) &&
                     ["ACTIVE", "TRIAL", "FROZEN"].includes(item.status) && (
                       <DropdownMenu>
                         <DropdownMenuTrigger
@@ -135,12 +137,21 @@ export function EnrollmentTable({ enrollments }: EnrollmentTableProps) {
                           <MoreVertical className="h-4 w-4 text-slate-500" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[180px] glass-card p-1">
+                          {canEdit && (
+                            <DropdownMenuItem
+                              onClick={() => onEdit(item)}
+                              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
+                            >
+                              <Pencil className="h-4 w-4 text-slate-500" />
+                              <span>Chỉnh sửa</span>
+                            </DropdownMenuItem>
+                          )}
                           {canComplete && (
                             <DropdownMenuItem
                               onClick={async () => {
                                 const ok = await confirm({
                                   title: "Xác nhận hoàn thành khóa học",
-                                  description: `Đánh dấu học viên ${item.studentName} đã hoàn thành khóa học tại lớp ${item.className}?`,
+                                  description: `Đánh dấu học viên ${item.studentFullName} đã hoàn thành khóa học tại lớp ${item.className}?`,
                                   confirmLabel: "Xác nhận",
                                   cancelLabel: "Hủy",
                                   variant: "default",
@@ -160,7 +171,7 @@ export function EnrollmentTable({ enrollments }: EnrollmentTableProps) {
                               onClick={async () => {
                                 const ok = await confirm({
                                   title: "Xác nhận hủy ghi danh",
-                                  description: `Bạn có chắc chắn muốn hủy ghi danh của học viên ${item.studentName} tại lớp ${item.className}?`,
+                                  description: `Bạn có chắc chắn muốn hủy ghi danh của học viên ${item.studentFullName} tại lớp ${item.className}?`,
                                   confirmLabel: "Hủy học",
                                   cancelLabel: "Quay lại",
                                   variant: "destructive",

@@ -17,10 +17,13 @@ import { useStudents } from "@/features/students/hooks/use-students";
 import {
   useEnrollments,
   useCreateEnrollment,
+  useUpdateEnrollment,
   EnrollmentTable,
   createEnrollmentFormConfig,
   enrollmentSchema,
   type CreateEnrollmentDto,
+  type UpdateEnrollmentDto,
+  type Enrollment,
 } from "@/features/enrollments";
 
 export default function EnrollmentsPage() {
@@ -30,6 +33,7 @@ export default function EnrollmentsPage() {
   const limit = 10;
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [editingEnrollment, setEditingEnrollment] = React.useState<Enrollment | null>(null);
 
   // Fetch classes and students for selects and filter dropdowns
   const { data: classesData } = useClasses({ limit: 1000 });
@@ -43,6 +47,7 @@ export default function EnrollmentsPage() {
   });
 
   const createMutation = useCreateEnrollment();
+  const updateMutation = useUpdateEnrollment();
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -61,24 +66,39 @@ export default function EnrollmentsPage() {
   };
 
   const handleCreate = () => {
+    setEditingEnrollment(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (enrollment: Enrollment) => {
+    setEditingEnrollment(enrollment);
     setIsModalOpen(true);
   };
 
   const handleFormSubmit = async (values: any) => {
-    const payload: CreateEnrollmentDto = {
-      studentId: values.studentId,
-      classId: values.classId,
-      startDate: values.startDate,
-      endDate: values.endDate || null,
-      source: values.source,
-      note: values.note || null,
-    };
-
-    await createMutation.mutateAsync(payload, {
-      onSuccess: () => {
-        setIsModalOpen(false);
-      },
-    });
+    if (editingEnrollment) {
+      const payload: UpdateEnrollmentDto = {
+        enrolledDate: values.enrolledDate,
+        startDate: values.startDate,
+        endDate: values.endDate || null,
+        status: values.status,
+        source: values.source,
+        note: values.note?.trim() || null,
+      };
+      await updateMutation.mutateAsync({ id: editingEnrollment.id, data: payload });
+    } else {
+      const payload: CreateEnrollmentDto = {
+        studentId: values.studentId,
+        classId: values.classId,
+        enrolledDate: values.enrolledDate,
+        startDate: values.startDate,
+        status: values.status,
+        source: values.source,
+        note: values.note?.trim() || null,
+      };
+      await createMutation.mutateAsync(payload);
+    }
+    setIsModalOpen(false);
   };
 
   const studentOptions = React.useMemo(() => {
@@ -100,8 +120,8 @@ export default function EnrollmentsPage() {
   }, [classesData]);
 
   const formConfigs = React.useMemo(() => {
-    return createEnrollmentFormConfig(studentOptions, classOptions);
-  }, [studentOptions, classOptions]);
+    return createEnrollmentFormConfig(studentOptions, classOptions, editingEnrollment !== null);
+  }, [studentOptions, classOptions, editingEnrollment]);
 
   const canCreate = hasPermission("enrollment:create");
 
@@ -179,7 +199,7 @@ export default function EnrollmentsPage() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <EnrollmentTable enrollments={data.data} />
+          <EnrollmentTable enrollments={data.data} onEdit={handleEdit} />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 px-2">
@@ -222,11 +242,12 @@ export default function EnrollmentsPage() {
       <CrudFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        title="Ghi danh học viên mới"
+        title={editingEnrollment ? "Cập nhật ghi danh" : "Ghi danh học viên mới"}
         description="Đăng ký cho học viên ghi danh vào lớp học chính thức hoặc học thử."
-        submitLabel="Ghi danh học"
+        submitLabel={editingEnrollment ? "Lưu thay đổi" : "Ghi danh học"}
         configs={formConfigs}
         validationSchema={enrollmentSchema}
+        initialValues={editingEnrollment ?? undefined}
         onSubmit={handleFormSubmit}
       />
     </div>

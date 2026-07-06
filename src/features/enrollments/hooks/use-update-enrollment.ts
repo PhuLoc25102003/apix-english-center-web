@@ -7,19 +7,15 @@ import type { ApiError, ApiResponse } from "@/lib/api";
 
 export function useUpdateEnrollment() {
   const queryClient = useQueryClient();
-
-  return useMutation<
-    ApiResponse<Enrollment>,
-    ApiError,
-    { id: string; data: UpdateEnrollmentDto }
-  >({
+  return useMutation<ApiResponse<Enrollment>, ApiError, { id: string; data: UpdateEnrollmentDto }>({
     mutationFn: ({ id, data }) => enrollmentApi.update(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() });
       toast.success(response.message || "Cập nhật ghi danh thành công!");
     },
     onError: (error) => {
-      toast.error(error.message || "Đã xảy ra lỗi khi cập nhật ghi danh.");
+      const fieldMessage = error.details.find((detail) => detail.message)?.message;
+      toast.error(fieldMessage || error.message || "Không thể cập nhật ghi danh.");
     },
   });
 }
