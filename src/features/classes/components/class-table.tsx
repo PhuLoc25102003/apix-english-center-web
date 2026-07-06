@@ -34,6 +34,7 @@ export const classStatusLabels: Record<ClassStatus, string> = {
   ACTIVE: "Đang học",
   CLOSED: "Đã kết thúc",
   CANCELLED: "Đã hủy",
+  REVISED: "Đã điều chỉnh",
 };
 
 export function formatClassDate(value: string): string {

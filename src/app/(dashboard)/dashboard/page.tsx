@@ -1,89 +1,53 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Dashboard | APIX English Center",
-  description: "Dashboard overview for APIX English Center.",
-};
+import * as React from "react";
+import { PageHeader } from "@/components/common/page-header";
+import { getCurrentUser } from "@/lib/auth/current-user-storage";
+import { OwnerDashboard } from "@/features/dashboard/components/owner-dashboard";
+import { OfficeDashboard } from "@/features/dashboard/components/office-dashboard";
+import { TeacherDashboard } from "@/features/dashboard/components/teacher-dashboard";
+import { EmployeeDashboard } from "@/features/dashboard/components/employee-dashboard";
 
 export default function DashboardPage() {
+  const user = getCurrentUser();
+  const roles = user?.roles ?? [];
+
+  // Determine dashboard view based on permissions or roles
+  const renderDashboard = () => {
+    if (roles.includes("SUPER_ADMIN") || roles.includes("OWNER") || roles.includes("MANAGER")) {
+      return <OwnerDashboard />;
+    }
+    if (roles.includes("STAFF")) {
+      return <OfficeDashboard />;
+    }
+    if (roles.includes("TEACHER")) {
+      return <TeacherDashboard />;
+    }
+    return <EmployeeDashboard />;
+  };
+
+  const getDashboardTitle = () => {
+    if (roles.includes("SUPER_ADMIN") || roles.includes("OWNER") || roles.includes("MANAGER")) {
+      return "Bảng quản trị trung tâm";
+    }
+    if (roles.includes("STAFF")) {
+      return "Bảng điều hành nghiệp vụ";
+    }
+    if (roles.includes("TEACHER")) {
+      return "Bảng quản lý lớp giảng dạy";
+    }
+    return "Không gian làm việc cá nhân";
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Welcome banner */}
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-[#111827]">
-          Center Overview
-        </h1>
-        <p className="text-sm text-[#6B7280]">
-          Welcome to the APIX English Center Management System. Here is a summary of activities.
-        </p>
+      <div className="flex flex-col gap-1">
+        <PageHeader
+          title={getDashboardTitle()}
+          description={`Chào mừng trở lại, ${user?.fullName ?? "Thành viên APIX"}. Hệ thống đã đồng bộ dữ liệu lúc ${new Date().toLocaleTimeString("vi-VN")}.`}
+        />
       </div>
-
-      {/* Metrics Grid Placeholder */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Metric 1 */}
-        <div className="glass-card p-6 flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-            Total Students
-          </span>
-          <span className="font-display text-3xl font-bold text-[#111827]">
-            128
-          </span>
-          <span className="text-xs font-medium text-emerald-600">
-            ▲ +12% this month
-          </span>
-        </div>
-
-        {/* Metric 2 */}
-        <div className="glass-card p-6 flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-            Active Classes
-          </span>
-          <span className="font-display text-3xl font-bold text-[#111827]">
-            14
-          </span>
-          <span className="text-xs font-medium text-emerald-600">
-            ▲ +2 new this week
-          </span>
-        </div>
-
-        {/* Metric 3 */}
-        <div className="glass-card p-6 flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-            Attendance Today
-          </span>
-          <span className="font-display text-3xl font-bold text-[#111827]">
-            94.2%
-          </span>
-          <span className="text-xs font-medium text-emerald-600">
-            ▲ +1.5% compared to yesterday
-          </span>
-        </div>
-
-        {/* Metric 4 */}
-        <div className="glass-card p-6 flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-            Pending Invoice Value
-          </span>
-          <span className="font-display text-3xl font-bold text-[#111827]">
-            42M ₫
-          </span>
-          <span className="text-xs font-medium text-[#C90012]">
-            ▼ -8% compared to last period
-          </span>
-        </div>
-      </div>
-
-      {/* Placeholder Details Area */}
-      <div className="glass-card p-6">
-        <h2 className="font-display text-lg font-bold text-[#111827] mb-4">
-          Recent Registrations
-        </h2>
-        <div className="flex h-36 items-center justify-center rounded-lg border border-dashed border-border bg-[#F8FAFC]">
-          <span className="text-sm font-medium text-[#6B7280]">
-            Student list implementation coming in Phase 4
-          </span>
-        </div>
-      </div>
+      {renderDashboard()}
     </div>
   );
 }

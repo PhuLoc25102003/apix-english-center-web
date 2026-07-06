@@ -116,6 +116,8 @@ export const attendanceKeys = {
     [...attendanceKeys.lists(), filters] as const,
   bySession: (sessionId: string) =>
     [...attendanceKeys.all, "session", sessionId] as const,
+  sessionStudents: (sessionId: string) =>
+    [...attendanceKeys.all, "session", sessionId, "students"] as const,
 };
 
 // ── Tuition ───────────────────────────────────────────────────────────────────

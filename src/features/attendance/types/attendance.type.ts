@@ -35,3 +35,53 @@ export type ClassSessionFilters = ListParams & {
   status?: ClassSessionStatus;
   sessionDate?: string;
 };
+
+// ── Student Attendance Management Types ─────────────────────────────────────
+
+export type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
+
+export interface SessionAttendanceStudent {
+  studentId: string;
+  studentCode: string;
+  studentName: string;
+  status: AttendanceStatus | null;
+  note: string | null;
+  savedStatus: "saved" | "dirty" | "not_marked";
+  markedAt?: string | null;
+  markedBy?: string | null;
+  isLocked?: boolean;
+  source?: "TEACHER" | "OFFICE_STAFF" | "SYSTEM";
+  absentReason?: string | null;
+}
+
+export interface StudentAttendanceRecord {
+  id: string;
+  sessionId: string;
+  studentId: string;
+  status: AttendanceStatus;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  note: string | null;
+  markedBy: string | null;
+  markedAt: string | null;
+}
+
+export interface SaveStudentAttendanceItem {
+  studentId: string;
+  status: AttendanceStatus;
+  note: string | null;
+}
+
+export interface SaveStudentAttendanceRequest {
+  records: SaveStudentAttendanceItem[];
+}
+
+export interface SaveStudentAttendanceResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface SessionAttendanceDetail {
+  session: ClassSession;
+  students: SessionAttendanceStudent[];
+}

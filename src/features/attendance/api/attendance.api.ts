@@ -1,16 +1,21 @@
 /**
  * src/features/attendance/api/attendance.api.ts
  *
- * Client-side mock storage API layer for class sessions.
- * Implements full CRUD capabilities to enable visual verification.
+ * Client-side mock storage API layer for class sessions and student attendance.
+ * Fetches real student enrollments from the backend and stores attendance records locally.
  */
 
+import { classApi } from "@/features/classes/api/class.api";
 import type { ApiResponse, PageResponse } from "@/lib/api";
 import type {
   ClassSession,
   ClassSessionFilters,
   CreateClassSessionRequest,
   UpdateClassSessionRequest,
+  SessionAttendanceStudent,
+  SaveStudentAttendanceRequest,
+  SessionAttendanceDetail,
+  StudentAttendanceRecord,
 } from "../types/attendance.type";
 
 const isClient = typeof window !== "undefined";
@@ -177,5 +182,83 @@ export const attendanceApi = {
     if (changed) {
       saveStoredSessions(updated);
     }
+  },
+
+  // ── Student Attendance Methods ─────────────────────────────────────────────
+
+  async getSessionStudents(sessionId: string): Promise<SessionAttendanceDetail> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const sessions = getStoredSessions();
+    const session = sessions.find((s) => s.id === sessionId);
+    if (!session) {
+      throw new Error("Không tìm thấy buổi học.");
+    }
+
+    // Load real enrollments from backend
+    const enrollmentsResponse = await classApi.getEnrollments(session.classId);
+    const enrollments = enrollmentsResponse.data ?? [];
+
+    // Load marked attendance from local storage
+    const storageKey = `apix_student_attendance_${sessionId}`;
+    const savedRecordsString = isClient ? localStorage.getItem(storageKey) : null;
+    const savedRecords: StudentAttendanceRecord[] = savedRecordsString
+      ? JSON.parse(savedRecordsString)
+      : [];
+
+    const students: SessionAttendanceStudent[] = enrollments.map((enr) => {
+      const saved = savedRecords.find((rec) => rec.studentId === enr.studentId);
+      return {
+        studentId: enr.studentId,
+        studentCode: enr.studentCode,
+        studentName: enr.studentName,
+        status: saved ? saved.status : null,
+        note: saved ? saved.note : null,
+        savedStatus: saved ? "saved" : "not_marked",
+        markedAt: saved ? saved.markedAt : null,
+        markedBy: saved ? saved.markedBy : null,
+      };
+    });
+
+    return {
+      session,
+      students,
+    };
+  },
+
+  async saveStudentAttendance(
+    sessionId: string,
+    payload: SaveStudentAttendanceRequest
+  ): Promise<ApiResponse<null>> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const sessions = getStoredSessions();
+    const session = sessions.find((s) => s.id === sessionId);
+    if (!session) {
+      throw new Error("Không tìm thấy buổi học.");
+    }
+
+    const storageKey = `apix_student_attendance_${sessionId}`;
+    const timestamp = new Date().toISOString();
+
+    const records: StudentAttendanceRecord[] = payload.records.map((item) => ({
+      id: `att-${sessionId}-${item.studentId}`,
+      sessionId,
+      studentId: item.studentId,
+      status: item.status,
+      checkInTime: null,
+      checkOutTime: null,
+      note: item.note,
+      markedBy: "Giảng viên (Mock Admin)",
+      markedAt: timestamp,
+    }));
+
+    if (isClient) {
+      localStorage.setItem(storageKey, JSON.stringify(records));
+    }
+
+    return {
+      success: true,
+      message: "Lưu điểm danh học viên thành công!",
+      data: null,
+    };
   },
 };

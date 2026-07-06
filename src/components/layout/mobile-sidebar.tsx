@@ -8,11 +8,25 @@ import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { sidebarNavItems } from "./sidebar";
+import { sidebarNavGroups } from "./sidebar";
+import { hasPermission } from "@/lib/permissions/has-permission";
 
 export function MobileSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+
+  // Filter groups and items based on permissions
+  const visibleGroups = React.useMemo(() => {
+    return sidebarNavGroups
+      .map((group) => {
+        const visibleItems = group.items.filter((item) => {
+          if (!item.permission) return true;
+          return hasPermission(item.permission);
+        });
+        return { ...group, items: visibleItems };
+      })
+      .filter((group) => group.items.length > 0);
+  }, [pathname, open]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -25,7 +39,7 @@ export function MobileSidebar() {
         }
       />
 
-      <SheetContent side="left" className="w-72 glass-sidebar p-6 border-r border-[#FF161A]/10">
+      <SheetContent side="left" className="w-72 glass-sidebar p-6 border-r border-[#FF161A]/10 overflow-y-auto">
         <div className="flex flex-col h-full">
           {/* Header */}
           <Link
@@ -40,41 +54,50 @@ export function MobileSidebar() {
               width={1812}
               height={1376}
               sizes="112px"
-              className="h-auto w-28 object-contain"
+              className="h-auto w-24 object-contain"
             />
           </Link>
 
           {/* Divider */}
-          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-[#FF161A]/10 to-transparent" />
+          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-[#FF161A]/10 to-transparent" />
 
           {/* Nav Links */}
-          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto pr-2">
-            {sidebarNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
+          <nav className="flex flex-1 flex-col gap-4">
+            {visibleGroups.map((group) => (
+              <div key={group.title} className="flex flex-col gap-1">
+                <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  {group.title}
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
-                    isActive
-                      ? "bg-[#FFE8EA] text-[#C90012] font-semibold"
-                      : "text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      "h-4 w-4 shrink-0 transition-colors",
-                      isActive ? "text-[#FF161A]" : "text-[#9CA3AF]"
-                    )}
-                  />
-                  {item.title}
-                </Link>
-              );
-            })}
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-150",
+                          isActive
+                            ? "bg-[#FFE8EA] text-[#C90012] font-bold"
+                            : "text-[#6B7280] hover:bg-slate-100 hover:text-[#111827]"
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            "h-4 w-4 shrink-0 transition-colors",
+                            isActive ? "text-[#FF161A]" : "text-[#9CA3AF]"
+                          )}
+                        />
+                        {item.title}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </div>
       </SheetContent>

@@ -6,9 +6,10 @@ export const classStatuses = [
   "ACTIVE",
   "CLOSED",
   "CANCELLED",
+  "REVISED", // added in standard updates
 ] as const;
 
-export type ClassStatus = (typeof classStatuses)[number];
+export type ClassStatus = "PLANNING" | "OPEN" | "ACTIVE" | "CLOSED" | "CANCELLED" | "REVISED";
 
 export interface ClassRecord {
   id: string;
@@ -59,4 +60,6 @@ export interface ClassEnrollment {
   status: string;
   source: string | null;
   note: string | null;
+  parentName?: string | null;
+  parentPhone?: string | null;
 }

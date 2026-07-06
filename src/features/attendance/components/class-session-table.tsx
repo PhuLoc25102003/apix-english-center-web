@@ -7,7 +7,8 @@
  */
 
 import * as React from "react";
-import { MoreVertical, Edit, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MoreVertical, Edit, Trash2, UserCheck } from "lucide-react";
 
 import {
   Table,
@@ -59,6 +60,7 @@ export function ClassSessionTable({
   onEdit,
   showClassColumn = true,
 }: ClassSessionTableProps) {
+  const router = useRouter();
   const deleteMutation = useDeleteClassSession();
   const confirm = useConfirm();
 
@@ -132,6 +134,13 @@ export function ClassSessionTable({
                         <MoreVertical className="h-4 w-4 text-slate-500" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] glass-card p-1">
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/sessions/${session.id}/attendance`)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
+                        >
+                          <UserCheck className="h-4 w-4 text-emerald-500" />
+                          <span>Điểm danh</span>
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => onEdit(session.id)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
