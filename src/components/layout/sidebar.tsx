@@ -16,6 +16,7 @@ import {
   CalendarCheck2,
   CreditCard,
   Settings,
+  Layers,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export const sidebarNavItems = [
   { title: "Parents", href: "/parents", icon: UserCheck },
   { title: "Campuses", href: "/campuses", icon: Building2 },
   { title: "Rooms", href: "/rooms", icon: DoorOpen },
+  { title: "Levels", href: "/levels", icon: Layers },
   { title: "Courses", href: "/courses", icon: BookOpen },
   { title: "Classes", href: "/classes", icon: GraduationCap },
   { title: "Enrollments", href: "/enrollments", icon: ClipboardList },

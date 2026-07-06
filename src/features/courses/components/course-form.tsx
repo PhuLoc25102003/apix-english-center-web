@@ -30,6 +30,10 @@ export function CourseForm({
   onRetryDetails,
 }: CourseFormProps) {
   const levelsQuery = useLevels({ page: 1, limit: 1000 });
+  const activeLevels = React.useMemo(
+    () => (levelsQuery.data?.data ?? []).filter((level) => level.isActive),
+    [levelsQuery.data],
+  );
   const levelOptions = React.useMemo(
     () =>
       [...(levelsQuery.data?.data ?? [])]
@@ -44,7 +48,16 @@ export function CourseForm({
     () => createCourseFormConfig(levelOptions),
     [levelOptions],
   );
-  const levelError = levelsQuery.error?.message;
+  const noActiveLevels =
+    !levelsQuery.isLoading &&
+    !levelsQuery.isError &&
+    levelsQuery.data &&
+    activeLevels.length === 0;
+  const levelError =
+    levelsQuery.error?.message ||
+    (noActiveLevels
+      ? "Chưa có cấp độ hoạt động nào trong hệ thống. Vui lòng tạo và kích hoạt cấp độ trước khi thêm khóa học."
+      : undefined);
 
   return (
     <CrudFormModal
