@@ -15,12 +15,6 @@ export const studentTypeItems = [
   { value: "ADULT", label: "Người lớn (Adult)" },
 ];
 
-export const accessModeItems = [
-  { value: "NO_ACCOUNT", label: "Không có tài khoản" },
-  { value: "PARENT_MANAGED", label: "Phụ huynh quản lý" },
-  { value: "OWN_ACCOUNT", label: "Tài khoản riêng" },
-];
-
 export const statusItems = [
   { value: "ACTIVE", label: "Hoạt động" },
   { value: "INACTIVE", label: "Ngưng hoạt động" },
@@ -71,7 +65,7 @@ export const studentFormConfig: FormInputConfig[] = [
   {
     type: "section-header",
     name: "education_header",
-    label: "Trường học & Phân quyền truy cập",
+    label: "Trường học & Trạng thái",
     icon: <Award className="h-5 w-5 text-[#FF161A]" />,
   },
   {
@@ -90,15 +84,7 @@ export const studentFormConfig: FormInputConfig[] = [
     icon: <Award className="h-4 w-4" />,
     colSpan: 1,
   },
-  {
-    name: "accessMode",
-    label: "Chế độ tài khoản",
-    type: "select",
-    required: true,
-    placeholder: "Chọn chế độ tài khoản",
-    options: accessModeItems,
-    colSpan: 1,
-  },
+
   {
     name: "status",
     label: "Trạng thái hoạt động",

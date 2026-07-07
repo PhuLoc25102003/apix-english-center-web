@@ -24,6 +24,7 @@ import {
   createClassScheduleFormConfig,
   classScheduleSchema,
   type ClassScheduleFormValues,
+  CreateSchedulePatternModal,
 } from "@/features/class-schedules";
 
 export default function SchedulesPage() {
@@ -35,6 +36,7 @@ export default function SchedulesPage() {
 
   // Modal form states
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isPatternModalOpen, setIsPatternModalOpen] = React.useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = React.useState<string | null>(null);
 
   const { data: classesData } = useClasses({ limit: 1000 });
@@ -80,7 +82,7 @@ export default function SchedulesPage() {
 
   const handleCreate = () => {
     setSelectedScheduleId(null);
-    setIsModalOpen(true);
+    setIsPatternModalOpen(true);
   };
 
   const handleEdit = (id: string) => {
@@ -302,6 +304,14 @@ export default function SchedulesPage() {
         } : undefined}
         onSubmit={handleFormSubmit}
         isLoadingDetails={selectedScheduleId ? isLoadingDetail : false}
+      />
+
+      <CreateSchedulePatternModal
+        open={isPatternModalOpen}
+        onOpenChange={setIsPatternModalOpen}
+        classes={classOptions}
+        rooms={roomOptions}
+        onSuccess={() => refetch()}
       />
     </div>
   );

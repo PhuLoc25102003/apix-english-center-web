@@ -28,6 +28,7 @@ import {
 export default function CurriculumsPage() {
   const [search, setSearch] = React.useState("");
   const [courseId, setCourseId] = React.useState("");
+  const [isActive, setIsActive] = React.useState("");
   const [page, setPage] = React.useState(1);
   const limit = 10;
 
@@ -42,6 +43,7 @@ export default function CurriculumsPage() {
     limit,
     search: search || undefined,
     courseId: courseId || undefined,
+    isActive: isActive === "" ? undefined : isActive === "true",
   });
 
   const { data: curriculumDetail, isLoading: isLoadingDetail } = useCurriculum(
@@ -65,6 +67,7 @@ export default function CurriculumsPage() {
   const handleClearFilters = () => {
     setSearch("");
     setCourseId("");
+    setIsActive("");
     setPage(1);
   };
 
@@ -169,9 +172,21 @@ export default function CurriculumsPage() {
               </option>
             ))}
           </select>
+          <select
+            value={isActive}
+            onChange={(e) => {
+              setIsActive(e.target.value);
+              setPage(1);
+            }}
+            className="h-10 rounded-xl bg-white/60 focus:bg-white border border-slate-200 text-xs font-semibold px-3 text-slate-700 outline-none cursor-pointer min-w-[180px]"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Tạm ngưng</option>
+          </select>
         </div>
 
-        {(search || courseId) && (
+        {(search || courseId || isActive) && (
           <Button
             onClick={handleClearFilters}
             variant="ghost"
@@ -195,12 +210,12 @@ export default function CurriculumsPage() {
         <EmptyState
           title="Không tìm thấy giáo trình nào"
           description={
-            search || courseId
+            search || courseId || isActive
               ? "Không tìm thấy kết quả khớp với bộ lọc hiện tại."
               : "Hệ thống chưa có giáo trình nào."
           }
-          actionLabel={search || courseId ? "Xóa bộ lọc" : undefined}
-          onAction={search || courseId ? handleClearFilters : undefined}
+          actionLabel={search || courseId || isActive ? "Xóa bộ lọc" : undefined}
+          onAction={search || courseId || isActive ? handleClearFilters : undefined}
         />
       ) : (
         <div className="flex flex-col gap-4">

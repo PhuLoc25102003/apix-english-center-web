@@ -16,3 +16,4 @@ export * from "./hooks/use-student-parents";
 export * from "./hooks/use-link-student-parent";
 export * from "./hooks/use-unlink-student-parent";
 export * from "./components/student-parent-section";
+export * from "./hooks/use-student-classes";

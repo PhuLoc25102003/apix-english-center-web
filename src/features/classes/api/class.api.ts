@@ -99,9 +99,21 @@ async function getEnrollments(
   }
 }
 
+async function getMyClasses(): Promise<ApiResponse<ClassRecord[]>> {
+  try {
+    const { data } = await apiClient.get<ApiResponse<ClassRecord[]>>(
+      `${API_ENDPOINTS.classes.list}/my-classes`
+    );
+    return data;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
 export const classApi = {
   ...baseClassApi,
   getAll,
   update,
   getEnrollments,
+  getMyClasses,
 };

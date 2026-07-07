@@ -18,10 +18,6 @@ export default function DashboardPage() {
       router.replace("/dashboard/office");
     } else if (roles.includes("TEACHER")) {
       router.replace("/dashboard/teacher");
-    } else if (roles.includes("STUDENT")) {
-      router.replace("/student/dashboard");
-    } else if (roles.includes("PARENT")) {
-      router.replace("/parent/dashboard");
     } else {
       router.replace("/dashboard/employee");
     }

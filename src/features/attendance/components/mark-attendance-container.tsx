@@ -8,8 +8,9 @@
  */
 
 import * as React from "react";
-import { Check, RotateCcw, AlertCircle, Save } from "lucide-react";
+import { Check, RotateCcw, AlertCircle, Save, CheckCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/feedback/loading-state";
@@ -22,6 +23,7 @@ import { useRooms } from "@/features/rooms/hooks/use-rooms";
 
 import { useSessionStudents } from "../hooks/use-session-students";
 import { useSaveStudentAttendance } from "../hooks/use-save-student-attendance";
+import { useUpdateClassSession } from "../hooks/use-update-class-session";
 import { SessionAttendanceHeader } from "./session-attendance-header";
 import { StudentAttendanceTable } from "./student-attendance-table";
 import type { SessionAttendanceStudent, AttendanceStatus } from "../types/attendance.type";
@@ -41,8 +43,9 @@ export function MarkAttendanceContainer({ sessionId }: MarkAttendanceContainerPr
   // Main attendance detail query
   const { data, isLoading, isError, error, refetch, isRefetching } = useSessionStudents(sessionId);
 
-  // Mutation
+  // Mutations
   const saveMutation = useSaveStudentAttendance(sessionId);
+  const updateSessionMutation = useUpdateClassSession();
 
   // Local state holding the list of students with current (possibly dirty) values
   const [localStudents, setLocalStudents] = React.useState<SessionAttendanceStudent[]>([]);
@@ -164,6 +167,27 @@ export function MarkAttendanceContainer({ sessionId }: MarkAttendanceContainerPr
     }
   };
 
+  const handleCompleteSession = async () => {
+    const ok = await confirm({
+      title: "Hoàn tất buổi học",
+      description: "Bạn có chắc chắn muốn xác nhận hoàn thành buổi học này? Thao tác này sẽ khóa điểm danh và chuyển đổi trạng thái của buổi học.",
+      confirmLabel: "Xác nhận hoàn tất",
+      cancelLabel: "Hủy",
+      variant: "default",
+    });
+    if (ok) {
+      await updateSessionMutation.mutateAsync(
+        { id: sessionId, data: { status: "COMPLETED" } },
+        {
+          onSuccess: () => {
+            refetch();
+            toast.success("Buổi học đã được đánh dấu hoàn thành!");
+          },
+        }
+      );
+    }
+  };
+
   const isSaving = saveMutation.isPending;
   const classes = classesQuery.data?.data ?? [];
   const rooms = roomsQuery.data?.data ?? [];
@@ -212,9 +236,19 @@ export function MarkAttendanceContainer({ sessionId }: MarkAttendanceContainerPr
       {/* Action Controls & Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-2xl border border-white/40 bg-white/40 p-4 shadow-xs backdrop-blur-md">
         <div className="flex flex-wrap items-center gap-2.5">
+          {session.status === "PLANNED" && (
+            <Button
+              onClick={handleCompleteSession}
+              disabled={isSaving || students.length === 0}
+              className="font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl shadow-md shadow-emerald-600/15 transition-all inline-flex items-center gap-2 cursor-pointer"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Hoàn thành buổi học
+            </Button>
+          )}
           <Button
             onClick={handleMarkAllPresent}
-            disabled={isSaving || students.length === 0}
+            disabled={isSaving || students.length === 0 || session.status === "COMPLETED"}
             className="font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl shadow-md shadow-emerald-600/15 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Check className="h-4 w-4" />

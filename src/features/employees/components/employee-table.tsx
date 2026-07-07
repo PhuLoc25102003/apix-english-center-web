@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Edit, Trash2, Eye } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   Table,
@@ -44,6 +45,7 @@ const statusClasses: Record<string, string> = {
 export function EmployeeTable({ employees, onEdit }: EmployeeTableProps) {
   const deleteMutation = useDeleteEmployee();
   const confirm = useConfirm();
+  const router = useRouter();
 
   const canUpdate = hasPermission("employee:update");
   const canDelete = hasPermission("employee:delete");
@@ -123,6 +125,13 @@ export function EmployeeTable({ employees, onEdit }: EmployeeTableProps) {
                         <MoreVertical className="h-4 w-4 text-slate-500" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] glass-card p-1">
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/employees/${item.id}`)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors"
+                        >
+                          <Eye className="h-4 w-4 text-slate-400" />
+                          <span>Chi tiết</span>
+                        </DropdownMenuItem>
                         {canUpdate && (
                           <DropdownMenuItem
                             onClick={() => onEdit(item.id)}

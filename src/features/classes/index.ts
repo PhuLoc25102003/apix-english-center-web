@@ -6,3 +6,8 @@ export * from "./components/class-form";
 export * from "./components/class-filters";
 export * from "./components/class-table";
 export * from "./components/class-detail-container";
+export * from "./api/class-staff.api";
+export * from "./hooks/use-class-staff";
+export * from "./hooks/use-assign-class-staff";
+export * from "./hooks/use-remove-class-staff";
+export * from "./hooks/use-my-classes";

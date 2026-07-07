@@ -305,31 +305,11 @@ src/app/(dashboard)/settings/page.tsx
 src/app/(dashboard)/ai/page.tsx
 ```
 
-### 3.9 Parent portal routes
+### 3.9 Parent and Student Portals (REMOVED)
 
-```text
-src/app/(parent)/parent/dashboard/page.tsx
-src/app/(parent)/parent/children/[id]/page.tsx
-src/app/(parent)/parent/children/[id]/attendance/page.tsx
-src/app/(parent)/parent/children/[id]/weekly-updates/page.tsx
-src/app/(parent)/parent/children/[id]/scores/page.tsx
-src/app/(parent)/parent/children/[id]/learning-reports/page.tsx
-src/app/(parent)/parent/children/[id]/tuition/page.tsx
-src/app/(parent)/parent/children/[id]/media/page.tsx
-```
-
-### 3.10 Student portal routes
-
-```text
-src/app/(student)/student/dashboard/page.tsx
-src/app/(student)/student/timetable/page.tsx
-src/app/(student)/student/weekly-updates/page.tsx
-src/app/(student)/student/scores/page.tsx
-src/app/(student)/student/learning-reports/page.tsx
-src/app/(student)/student/media/page.tsx
-```
-
-Only students with `accessMode = OWN_ACCOUNT` should access student portal routes.
+Parent and Student web accounts/roles are removed. Parents and students will not use the web portal. Parents are contacted by Zalo/manual communication. Students are managed internally by staff/teachers.
+The route folders `src/app/(parent)` and `src/app/(student)` are deleted.
+Internal management pages for Students and Parents remain under `(dashboard)` (e.g. `/students` and `/parents`).
 
 ---
 
@@ -492,31 +472,9 @@ Teacher dashboard should show only assigned work:
 
 Teacher class pages must show students and academic information, but hide parent contact details by default.
 
-### 5.4 Parent
+### 5.4 Parent and Student Roles (REMOVED)
 
-Parent dashboard must use child switcher:
-
-```text
-Parent Dashboard
-├── Child switcher
-├── Tuition by month
-├── Attendance summary
-├── Weekly updates by week
-├── Scores
-├── Learning reports
-├── Timetable
-└── Media
-```
-
-### 5.5 Student
-
-Student portal is only for `OWN_ACCOUNT` students:
-
-- Timetable.
-- Weekly updates.
-- Scores.
-- Learning reports.
-- Media.
+Parents and students do not have account access or dashboards. All information is managed internally by staff/teachers. Parent communications are handled through manual channels/Zalo.
 
 ---
 

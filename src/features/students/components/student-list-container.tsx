@@ -32,7 +32,6 @@ import { useConfirm } from "@/hooks/use-confirm";
 export function StudentListContainer() {
   const [search, setSearch] = React.useState("");
   const [studentType, setStudentType] = React.useState("");
-  const [accessMode, setAccessMode] = React.useState("");
   const [status, setStatus] = React.useState("");
   const [page, setPage] = React.useState(1);
   const limit = 10;
@@ -52,10 +51,7 @@ export function StudentListContainer() {
     setPage(1);
   };
 
-  const handleAccessModeChange = (val: string) => {
-    setAccessMode(val);
-    setPage(1);
-  };
+
 
   const handleStatusChange = (val: string) => {
     setStatus(val);
@@ -67,7 +63,6 @@ export function StudentListContainer() {
     limit,
     search: search || undefined,
     studentType: studentType || undefined,
-    accessMode: accessMode || undefined,
     status: status || undefined,
   });
 
@@ -83,7 +78,6 @@ export function StudentListContainer() {
   const handleClearFilters = () => {
     setSearch("");
     setStudentType("");
-    setAccessMode("");
     setStatus("");
     setPage(1);
   };
@@ -99,6 +93,10 @@ export function StudentListContainer() {
   };
 
   const handleFormSubmit = async (values: StudentFormValues) => {
+    const payload = {
+      ...values,
+      accessMode: "NO_ACCOUNT" as const,
+    };
     if (selectedStudentId) {
       // Edit mode
       const ok = await confirm({
@@ -110,7 +108,7 @@ export function StudentListContainer() {
       });
       if (ok) {
         await updateMutation.mutateAsync(
-          { id: selectedStudentId, data: values },
+          { id: selectedStudentId, data: payload },
           {
             onSuccess: () => {
               setIsModalOpen(false);
@@ -121,7 +119,7 @@ export function StudentListContainer() {
       }
     } else {
       // Create mode
-      await createMutation.mutateAsync(values, {
+      await createMutation.mutateAsync(payload, {
         onSuccess: () => {
           setIsModalOpen(false);
         },
@@ -150,8 +148,6 @@ export function StudentListContainer() {
         onSearchChange={handleSearchChange}
         studentType={studentType}
         onStudentTypeChange={handleStudentTypeChange}
-        accessMode={accessMode}
-        onAccessModeChange={handleAccessModeChange}
         status={status}
         onStatusChange={handleStatusChange}
       />
@@ -169,12 +165,12 @@ export function StudentListContainer() {
         <EmptyState
           title="Không tìm thấy học viên nào"
           description={
-            search || studentType || accessMode || status
+            search || studentType || status
               ? "Không có học viên nào khớp với bộ lọc hiện tại. Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm."
               : "Hệ thống chưa có dữ liệu học viên nào."
           }
-          actionLabel={search || studentType || accessMode || status ? "Xóa bộ lọc" : undefined}
-          onAction={search || studentType || accessMode || status ? handleClearFilters : undefined}
+          actionLabel={search || studentType || status ? "Xóa bộ lọc" : undefined}
+          onAction={search || studentType || status ? handleClearFilters : undefined}
         />
       ) : (
         <div className="flex flex-col gap-4">

@@ -4,3 +4,4 @@ export * from "./use-create-enrollment";
 export * from "./use-update-enrollment";
 export * from "./use-cancel-enrollment";
 export * from "./use-complete-enrollment";
+export * from "./use-enroll-student-to-class";

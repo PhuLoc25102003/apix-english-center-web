@@ -51,14 +51,7 @@ export function StudentTable({ students, onEdit }: StudentTableProps) {
     return labels[type] || type;
   };
 
-  const getAccessModeLabel = (mode: AccessMode) => {
-    const labels: Record<AccessMode, string> = {
-      NO_ACCOUNT: "Không tài khoản",
-      PARENT_MANAGED: "Phụ huynh quản lý",
-      OWN_ACCOUNT: "Tài khoản riêng",
-    };
-    return labels[mode] || mode;
-  };
+
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-";
@@ -86,7 +79,6 @@ export function StudentTable({ students, onEdit }: StudentTableProps) {
                 <TableHead className="font-semibold text-slate-600 h-12">Họ và tên</TableHead>
                 <TableHead className="font-semibold text-slate-600 h-12">Ngày sinh</TableHead>
                 <TableHead className="font-semibold text-slate-600 h-12">Loại học viên</TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">Tài khoản</TableHead>
                 <TableHead className="font-semibold text-slate-600 h-12">Trạng thái</TableHead>
                 <TableHead className="w-[80px] h-12"></TableHead>
               </TableRow>
@@ -109,9 +101,7 @@ export function StudentTable({ students, onEdit }: StudentTableProps) {
                   <TableCell className="text-slate-600">
                     {getStudentTypeLabel(student.studentType)}
                   </TableCell>
-                  <TableCell className="text-slate-600">
-                    {getAccessModeLabel(student.accessMode)}
-                  </TableCell>
+
                   <TableCell>
                     <StatusBadge status={student.status} />
                   </TableCell>

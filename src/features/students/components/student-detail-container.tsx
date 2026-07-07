@@ -9,7 +9,20 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Edit, User, Calendar, Award, Shield, School, Clock } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit,
+  User,
+  Calendar,
+  Award,
+  Shield,
+  School,
+  Clock,
+  BookOpen,
+  GraduationCap,
+  ClipboardCheck,
+  MessageSquare,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
@@ -17,8 +30,9 @@ import { LoadingState } from "@/components/feedback/loading-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { StatusBadge } from "@/components/common/status-badge";
 import { useStudent } from "../hooks/use-student";
+import { useStudentClasses } from "../hooks/use-student-classes";
 import { StudentParentSection } from "./student-parent-section";
-import type { StudentType, AccessMode } from "../types/student.type";
+import type { StudentType } from "../types/student.type";
 
 // Modal refactoring imports
 import { CrudFormModal } from "@/components/modals/crud-form-modal";
@@ -27,6 +41,7 @@ import { studentSchema } from "../schemas/student.schema";
 import { useUpdateStudent } from "../hooks/use-update-student";
 import { useConfirm } from "@/hooks/use-confirm";
 import { StudentTuitionSection } from "@/features/tuition";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface StudentDetailContainerProps {
   id: string;
@@ -35,12 +50,13 @@ interface StudentDetailContainerProps {
 export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch, isRefetching } = useStudent(id);
-  
+  const { data: classesData, isLoading: isLoadingClasses } = useStudentClasses(id);
+
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const updateMutation = useUpdateStudent();
   const confirm = useConfirm();
 
-  if (isLoading) {
+  if (isLoading || isLoadingClasses) {
     return <LoadingState variant="spinner" className="min-h-[400px]" />;
   }
 
@@ -56,6 +72,12 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
   }
 
   const student = data.data;
+  const enrolledClasses = classesData?.data ?? [];
+
+  // Identify current active class
+  const currentEnrollment = enrolledClasses.find(
+    (c: any) => c.status === "ACTIVE" || c.status === "TRIAL"
+  );
 
   // Helper translations for display
   const getStudentTypeLabel = (type: StudentType) => {
@@ -68,22 +90,13 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
     return labels[type] || type;
   };
 
-  const getAccessModeLabel = (mode: AccessMode) => {
-    const labels: Record<AccessMode, string> = {
-      NO_ACCOUNT: "Không tài khoản",
-      PARENT_MANAGED: "Phụ huynh quản lý",
-      OWN_ACCOUNT: "Tài khoản riêng",
-    };
-    return labels[mode] || mode;
-  };
-
   const getGenderLabel = (gender: string) => {
     if (gender === "MALE") return "Nam";
     if (gender === "FEMALE") return "Nữ";
     return "Khác";
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "-";
     try {
       const date = new Date(dateStr);
@@ -128,7 +141,7 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
 
       <div className="grid gap-6 md:grid-cols-3">
         {/* Profile Card */}
-        <div className="glass-card p-6 border border-white/40 shadow-xs rounded-2xl flex flex-col items-center text-center justify-center gap-4">
+        <div className="glass-card p-6 border border-white/40 shadow-xs rounded-2xl flex flex-col items-center text-center justify-center gap-4 bg-white/50">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-apix-gradient text-3xl font-bold text-white shadow-lg shadow-[#FF161A]/20">
             {student.fullName.charAt(0).toUpperCase()}
           </div>
@@ -140,7 +153,7 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
         </div>
 
         {/* Info Grid Card */}
-        <div className="md:col-span-2 glass-card p-6 border border-white/40 shadow-xs rounded-2xl grid gap-5 sm:grid-cols-2">
+        <div className="md:col-span-2 glass-card p-6 border border-white/40 shadow-xs rounded-2xl grid gap-5 sm:grid-cols-2 bg-white/50">
           <div className="flex items-start gap-3">
             <Calendar className="h-5 w-5 text-slate-400 mt-0.5" />
             <div>
@@ -166,10 +179,21 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
           </div>
 
           <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-slate-400 mt-0.5" />
+            <GraduationCap className="h-5 w-5 text-slate-400 mt-0.5" />
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Chế độ tài khoản</span>
-              <span className="text-sm font-semibold text-slate-800">{getAccessModeLabel(student.accessMode)}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Lớp hiện tại</span>
+              {currentEnrollment ? (
+                <span className="text-sm font-semibold text-slate-800">
+                  {currentEnrollment.classCode} - {currentEnrollment.className}
+                  {currentEnrollment.primaryTeacherName && (
+                    <span className="block text-xs font-normal text-slate-500 mt-0.5">
+                      GV: {currentEnrollment.primaryTeacherName}
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <span className="text-sm font-medium text-slate-400 italic">Chưa ghi danh lớp học</span>
+              )}
             </div>
           </div>
 
@@ -209,6 +233,60 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
         </div>
       </div>
 
+      {/* Lịch sử lớp học & Tiến trình */}
+      <div className="glass-card p-6 border border-white/40 shadow-xs rounded-2xl bg-white/50 flex flex-col gap-4">
+        <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-[#FF161A]" />
+          Lịch sử lớp học & Tiến trình
+        </h3>
+        {enrolledClasses.length === 0 ? (
+          <p className="text-sm text-slate-500 italic text-center py-4">Chưa có lịch sử học tập tại trung tâm.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Lớp học</TableHead>
+                  <TableHead>Giáo viên chính</TableHead>
+                  <TableHead>Ngày ghi danh</TableHead>
+                  <TableHead>Ngày bắt đầu</TableHead>
+                  <TableHead>Điểm danh</TableHead>
+                  <TableHead>Điểm trung bình</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {enrolledClasses.map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-semibold text-slate-800">
+                      {item.classCode} - {item.className}
+                    </TableCell>
+                    <TableCell className="text-slate-600">{item.primaryTeacherName || "Chưa phân công"}</TableCell>
+                    <TableCell>{formatDate(item.enrolledDate)}</TableCell>
+                    <TableCell>{formatDate(item.startDate)}</TableCell>
+                    <TableCell>
+                      {item.attendanceSummary ? (
+                        <span className="text-xs font-medium text-slate-700">
+                          {item.attendanceSummary.present}/{item.attendanceSummary.total} (Vắng: {item.attendanceSummary.absent})
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-semibold">
+                      {item.scoreSummary?.average !== undefined ? item.scoreSummary.average.toFixed(1) : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={item.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
+
       {/* Linked Parents Relationship Section */}
       <div className="mt-4">
         <StudentParentSection studentId={student.id} />
@@ -237,8 +315,13 @@ export function StudentDetailContainer({ id }: StudentDetailContainerProps) {
             variant: "default",
           });
           if (ok) {
+            // Set accessMode default to keep API contracts intact
+            const payload = {
+              ...values,
+              accessMode: student.accessMode || "NO_ACCOUNT",
+            };
             await updateMutation.mutateAsync(
-              { id: student.id, data: values },
+              { id: student.id, data: payload },
               {
                 onSuccess: () => {
                   setIsModalOpen(false);

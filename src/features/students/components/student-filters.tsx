@@ -22,8 +22,6 @@ interface StudentFiltersProps {
   onSearchChange: (value: string) => void;
   studentType: string;
   onStudentTypeChange: (value: string) => void;
-  accessMode: string;
-  onAccessModeChange: (value: string) => void;
   status: string;
   onStatusChange: (value: string) => void;
 }
@@ -34,13 +32,6 @@ const studentTypeItems = [
   { value: "CHILD", label: "Tiểu học" },
   { value: "TEENAGER", label: "Thiếu niên" },
   { value: "ADULT", label: "Người lớn" },
-];
-
-const accessModeItems = [
-  { value: "ALL", label: "Tất cả" },
-  { value: "NO_ACCOUNT", label: "Không tài khoản" },
-  { value: "PARENT_MANAGED", label: "PH quản lý" },
-  { value: "OWN_ACCOUNT", label: "TK riêng" },
 ];
 
 const statusItems = [
@@ -54,8 +45,6 @@ export function StudentFilters({
   onSearchChange,
   studentType,
   onStudentTypeChange,
-  accessMode,
-  onAccessModeChange,
   status,
   onStatusChange,
 }: StudentFiltersProps) {
@@ -87,24 +76,6 @@ export function StudentFilters({
             <SelectItem value="CHILD">Tiểu học</SelectItem>
             <SelectItem value="TEENAGER">Thiếu niên</SelectItem>
             <SelectItem value="ADULT">Người lớn</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Access Mode Filter */}
-        <Select
-          value={accessMode || "ALL"}
-          onValueChange={(val: string | null) => onAccessModeChange(!val || val === "ALL" ? "" : val)}
-          items={accessModeItems}
-        >
-          <SelectTrigger className="w-full sm:w-auto bg-white/60 focus:bg-white text-sm border-border/60 hover:bg-slate-50 transition-colors px-3 py-1.5 h-9 rounded-xl flex items-center gap-1 cursor-pointer">
-            <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider select-none mr-0.5">Tài khoản:</span>
-            <SelectValue placeholder="Tất cả" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">Tất cả</SelectItem>
-            <SelectItem value="NO_ACCOUNT">Không tài khoản</SelectItem>
-            <SelectItem value="PARENT_MANAGED">PH quản lý</SelectItem>
-            <SelectItem value="OWN_ACCOUNT">TK riêng</SelectItem>
           </SelectContent>
         </Select>
 

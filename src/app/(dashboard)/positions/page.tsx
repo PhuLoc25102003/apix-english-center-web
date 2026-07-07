@@ -26,6 +26,8 @@ import {
 
 export default function PositionsPage() {
   const [search, setSearch] = React.useState("");
+  const [isTeachingPosition, setIsTeachingPosition] = React.useState("");
+  const [isActive, setIsActive] = React.useState("");
   const [page, setPage] = React.useState(1);
   const limit = 10;
 
@@ -37,6 +39,8 @@ export default function PositionsPage() {
     page,
     limit,
     search: search || undefined,
+    isTeachingPosition: isTeachingPosition === "" ? undefined : isTeachingPosition === "true",
+    isActive: isActive === "" ? undefined : isActive === "true",
   });
 
   const { data: positionDetail, isLoading: isLoadingDetail } = usePosition(
@@ -54,6 +58,8 @@ export default function PositionsPage() {
 
   const handleClearFilters = () => {
     setSearch("");
+    setIsTeachingPosition("");
+    setIsActive("");
     setPage(1);
   };
 
@@ -124,13 +130,51 @@ export default function PositionsPage() {
         }
       />
 
-      <div className="flex bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-xs">
-        <SearchInput
-          placeholder="Tìm mã hoặc tên chức vụ..."
-          value={search}
-          onChange={handleSearchChange}
-          className="w-full sm:max-w-xs"
-        />
+      <div className="flex flex-wrap gap-4 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-xs items-center justify-between">
+        <div className="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
+          <SearchInput
+            placeholder="Tìm mã hoặc tên chức vụ..."
+            value={search}
+            onChange={handleSearchChange}
+            className="w-full sm:max-w-xs"
+          />
+
+          <select
+            value={isTeachingPosition}
+            onChange={(e) => {
+              setIsTeachingPosition(e.target.value);
+              setPage(1);
+            }}
+            className="h-10 rounded-xl bg-white/60 focus:bg-white border border-slate-200 text-xs font-semibold px-3 text-slate-700 outline-none cursor-pointer min-w-[180px]"
+          >
+            <option value="">Tất cả vai trò</option>
+            <option value="true">Giảng dạy (Teaching)</option>
+            <option value="false">Hành chính (Staff)</option>
+          </select>
+
+          <select
+            value={isActive}
+            onChange={(e) => {
+              setIsActive(e.target.value);
+              setPage(1);
+            }}
+            className="h-10 rounded-xl bg-white/60 focus:bg-white border border-slate-200 text-xs font-semibold px-3 text-slate-700 outline-none cursor-pointer min-w-[180px]"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Tạm ngưng</option>
+          </select>
+        </div>
+
+        {(search || isTeachingPosition || isActive) && (
+          <Button
+            onClick={handleClearFilters}
+            variant="ghost"
+            className="text-slate-500 hover:text-slate-900 cursor-pointer text-xs"
+          >
+            Xóa bộ lọc
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -146,12 +190,12 @@ export default function PositionsPage() {
         <EmptyState
           title="Không tìm thấy chức vụ nào"
           description={
-            search
-              ? "Không có chức vụ nào khớp với từ khóa tìm kiếm."
+            search || isTeachingPosition || isActive
+              ? "Không có chức vụ nào khớp với bộ lọc tìm kiếm hiện tại."
               : "Hệ thống chưa có dữ liệu chức vụ."
           }
-          actionLabel={search ? "Xóa tìm kiếm" : undefined}
-          onAction={search ? handleClearFilters : undefined}
+          actionLabel={search || isTeachingPosition || isActive ? "Xóa bộ lọc" : undefined}
+          onAction={search || isTeachingPosition || isActive ? handleClearFilters : undefined}
         />
       ) : (
         <div className="flex flex-col gap-4">
