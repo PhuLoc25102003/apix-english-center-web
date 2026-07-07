@@ -96,7 +96,6 @@ export const sidebarNavGroups: SidebarGroup[] = [
       { title: "Scores", href: "/scores", icon: Award, permission: "score:read" },
       { title: "Learning Reports", href: "/learning-reports", icon: FileSpreadsheet, permission: "learning-report:read" },
       { title: "Learning Report Review", href: "/learning-reports/review", icon: CheckSquare, permission: "learning-report:approve" },
-      { title: "Videos / Media", href: "/media/videos", icon: Video, permission: "media-video:read" },
     ],
   },
   {
@@ -117,6 +116,7 @@ export const sidebarNavGroups: SidebarGroup[] = [
     items: [
       { title: "Contact Logs", href: "/contact-logs", icon: PhoneCall, permission: "contactlog:read" },
       { title: "Parent Notifications", href: "/notifications", icon: Bell, permission: "notification:read" },
+      { title: "Video Deliveries", href: "/video-deliveries", icon: Video, permission: "video-delivery:read" },
     ],
   },
   {

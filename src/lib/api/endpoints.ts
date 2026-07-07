@@ -37,6 +37,8 @@ const base = {
   positions: "/positions",
   schedules: "/class-schedules",
   users: "/users",
+  videoDeliveryBatches: "/video-delivery-batches",
+  videoDeliveries: "/video-deliveries",
 } as const;
 
 export const API_ENDPOINTS = {
@@ -252,5 +254,24 @@ export const API_ENDPOINTS = {
     presign: (token: string) => `/media/videos/upload-sessions/${token}/presign`,
     complete: (token: string) => `/media/videos/upload-sessions/${token}/complete`,
     deliveryStatus: (id: string) => `/notification-deliveries/${id}/status`,
+  },
+  videoDeliveryBatches: {
+    list: base.videoDeliveryBatches,
+    create: base.videoDeliveryBatches,
+    detail: (id: string) => `${base.videoDeliveryBatches}/${id}`,
+    update: (id: string) => `${base.videoDeliveryBatches}/${id}`,
+    cancel: (id: string) => `${base.videoDeliveryBatches}/${id}/cancel`,
+  },
+  videoDeliveries: {
+    list: base.videoDeliveries,
+    detail: (id: string) => `${base.videoDeliveries}/${id}`,
+    stats: `${base.videoDeliveries}/stats`,
+    prepareMessage: (id: string) => `${base.videoDeliveries}/${id}/prepare-message`,
+    copied: (id: string) => `${base.videoDeliveries}/${id}/copied`,
+    openedZalo: (id: string) => `${base.videoDeliveries}/${id}/opened-zalo`,
+    sent: (id: string) => `${base.videoDeliveries}/${id}/sent`,
+    failed: (id: string) => `${base.videoDeliveries}/${id}/failed`,
+    skipped: (id: string) => `${base.videoDeliveries}/${id}/skipped`,
+    reopen: (id: string) => `${base.videoDeliveries}/${id}/reopen`,
   },
 } as const;

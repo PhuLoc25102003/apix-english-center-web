@@ -60,7 +60,7 @@ Major changes:
 5. Add payroll and leave workflows for hourly/monthly salary.
 6. Add flexible tuition invoice items, refunds, and credits.
 7. Add two-month flexible learning report workflow.
-8. Add media/video module using external object storage metadata.
+8. Add Video Delivery Tracking for manual Zalo forwarding; video storage is not the default workflow.
 9. Add audit log pages for tracing who changed what.
 10. Rebuild sidebar by business workflow groups instead of a flat module list.
 
@@ -740,7 +740,43 @@ Manager/HR can:
 - Approve cancellation.
 - See payroll impact warning.
 
-### 6.8 Media/video page
+### 6.8 Video Delivery Tracking
+
+**Product principle:** Web manages workflow and accountability. Zalo sends the actual video quickly.
+
+The default video feature is **Video Delivery Tracking**. Teachers record videos on mobile and send them to the center's internal Zalo group. Office Staff use the web to identify recipients, filter by class/month/video type, prepare and copy a message, open the parent's Zalo contact, and record sent/failed/skipped outcomes. The web provides tracking, accountability, filters, message templates, and history logs.
+
+The system does **not** require uploading or storing videos by default. Direct forwarding in Zalo remains the fastest operational method. "Manual Zalo Delivery" means that a staff member performs the forwarding and records the result; it is not automatic Zalo API integration and the UI must never imply automatic sending.
+
+Primary routes:
+
+```text
+/video-deliveries
+/video-deliveries/batches/[id]
+/classes/[id]/video-deliveries
+/students/[id]/video-deliveries
+```
+
+Primary components live under `src/features/video-deliveries` and cover batch creation, delivery filters and table, summary statistics, prepared-message preview, manual Zalo actions, status badges, and delivery history.
+
+QR upload, temporary upload links, object storage, review, playback, and public share links are optional future enhancements. They are not MVP, are not the default monthly-video workflow, and must not be required before a staff member can deliver a video.
+
+#### 6.8.1 Manual Zalo Delivery Flow
+
+1. Teacher records a video and sends it to the center/internal Zalo group.
+2. Office Staff filters deliveries by class, month, and video type in the web.
+3. Office Staff prepares and copies the parent message.
+4. Office Staff opens Zalo and forwards the actual video manually.
+5. Office Staff returns to the web and records sent, failed, or skipped status.
+6. The web updates statistics and the accountability history.
+
+#### 6.8.2 Permission Rules
+
+Use `video-delivery:*` permission codes for page access, batch management, message preparation/copying, opening Zalo, status transitions, reopening, and assignment. Never hardcode role names.
+
+#### 6.8.3 Optional Future Media/QR Capability
+
+The following legacy routes describe an optional media library only. They must not appear as the primary video workflow or force QR/file upload:
 
 Routes:
 
@@ -753,7 +789,7 @@ Routes:
 /students/[id]/videos (if permission allows)
 ```
 
-#### 6.8.1 QR Video Upload UX Flow
+#### 6.8.4 Optional QR Video Upload UX Flow (Future Enhancement)
 1. **Initiate**: Desktop user selects class, student, video type, and target month, then clicks "Upload bằng điện thoại" (or "QR Upload Video").
 2. **Session Creation**: Backend creates an upload session and returns a session token and QR payload.
 3. **Display QR**: Desktop displays a QR code containing the mobile upload URL `/upload/video/[uploadToken]`.
@@ -763,7 +799,7 @@ Routes:
 7. **Complete**: Mobile calls complete-upload API. Desktop polls the session status and automatically updates the UI.
 8. **Review & Deliver**: Office Staff reviews the video, approves/rejects, generates a share link, copies the prepared Manual Zalo message, opens Zalo via `https://zalo.me/{phoneNumber}`, sends it manually, and marks it as sent.
 
-#### 6.8.2 Component Architecture (src/features/media-videos)
+#### 6.8.5 Optional Media Component Architecture (src/features/media-videos)
 - **VideoListContainer**: Coordinates listing, filtering, and review workflows.
 - **VideoTable**: Tabular metadata view (title, status, size, actions).
 - **VideoFilters**: Filter criteria (class, student, status, type, month).
@@ -776,8 +812,10 @@ Routes:
 - **VideoShareLinkPanel**: Panel for generating and revoking share links.
 - **ManualZaloVideoDeliveryPanel**: Semi-automated Zalo copy-message and status-tracking panel.
 
-#### 6.8.3 UX & Security Rules
-- **No Heavy Desktop Uploads**: Desktop should prompt "Upload bằng điện thoại" as primary action.
+#### 6.8.6 Optional Upload UX & Security Rules
+
+These rules apply only when the optional media capability is explicitly used. Upload must never be the primary action for normal monthly video delivery.
+- **Optional Mobile Upload Only**: If this future capability is enabled, desktop may offer mobile upload as a secondary, explicitly optional action. It must not replace Video Delivery Tracking.
 - **Mobile Simplicity**: Touch-optimized interface with large buttons. Cannot change student/class inputs. No parent private data exposed.
 - **Security Check**: Session tokens must expire. Show expired/invalid session states. Validate file size and MIME type.
 - **No Direct Storage Exposure**: Do not expose internal storage bucket keys in the UI.

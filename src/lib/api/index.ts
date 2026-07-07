@@ -39,6 +39,7 @@ export {
   curriculumKeys,
   positionKeys,
   scheduleKeys,
+  videoDeliveryKeys,
 } from "./query-keys";
 
 // CRUD factory

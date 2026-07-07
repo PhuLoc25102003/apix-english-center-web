@@ -1,53 +1,36 @@
 "use client";
 
 import * as React from "react";
-import { PageHeader } from "@/components/common/page-header";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user-storage";
-import { OwnerDashboard } from "@/features/dashboard/components/owner-dashboard";
-import { OfficeDashboard } from "@/features/dashboard/components/office-dashboard";
-import { TeacherDashboard } from "@/features/dashboard/components/teacher-dashboard";
-import { EmployeeDashboard } from "@/features/dashboard/components/employee-dashboard";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const user = getCurrentUser();
   const roles = user?.roles ?? [];
 
-  // Determine dashboard view based on permissions or roles
-  const renderDashboard = () => {
-    if (roles.includes("SUPER_ADMIN") || roles.includes("OWNER") || roles.includes("MANAGER")) {
-      return <OwnerDashboard />;
-    }
-    if (roles.includes("STAFF")) {
-      return <OfficeDashboard />;
-    }
-    if (roles.includes("TEACHER")) {
-      return <TeacherDashboard />;
-    }
-    return <EmployeeDashboard />;
-  };
+  React.useEffect(() => {
+    if (!user) return;
 
-  const getDashboardTitle = () => {
     if (roles.includes("SUPER_ADMIN") || roles.includes("OWNER") || roles.includes("MANAGER")) {
-      return "Bảng quản trị trung tâm";
+      router.replace("/dashboard/owner");
+    } else if (roles.includes("STAFF")) {
+      router.replace("/dashboard/office");
+    } else if (roles.includes("TEACHER")) {
+      router.replace("/dashboard/teacher");
+    } else if (roles.includes("STUDENT")) {
+      router.replace("/student/dashboard");
+    } else if (roles.includes("PARENT")) {
+      router.replace("/parent/dashboard");
+    } else {
+      router.replace("/dashboard/employee");
     }
-    if (roles.includes("STAFF")) {
-      return "Bảng điều hành nghiệp vụ";
-    }
-    if (roles.includes("TEACHER")) {
-      return "Bảng quản lý lớp giảng dạy";
-    }
-    return "Không gian làm việc cá nhân";
-  };
+  }, [user, roles, router]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <PageHeader
-          title={getDashboardTitle()}
-          description={`Chào mừng trở lại, ${user?.fullName ?? "Thành viên APIX"}. Hệ thống đã đồng bộ dữ liệu lúc ${new Date().toLocaleTimeString("vi-VN")}.`}
-        />
-      </div>
-      {renderDashboard()}
+    <div className="flex min-h-64 items-center justify-center">
+      <span className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#FF161A]" />
     </div>
   );
 }
+

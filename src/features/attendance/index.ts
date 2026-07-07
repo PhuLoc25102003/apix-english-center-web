@@ -1,12 +1,9 @@
 export * from "./types/attendance.type";
+export * from "./schemas/class-session.schema";
 export * from "./api/attendance.api";
 export * from "./hooks";
 export * from "./components/class-session-table";
 export * from "./components/attendance-filters";
-export * from "./components/attendance-status-control";
-export * from "./components/student-attendance-table";
-export * from "./components/session-attendance-header";
-export * from "./components/mark-attendance-container";
-export * from "./schemas/class-session.schema";
-export * from "./schemas/mark-attendance.schema";
 export * from "./configs/class-session-form.config";
+export * from "./components/mark-attendance-container";
+

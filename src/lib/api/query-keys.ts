@@ -139,6 +139,17 @@ export const authKeys = {
   me: ["auth", "me"] as const,
 };
 
+export const videoDeliveryKeys = {
+  all: ["video-deliveries"] as const,
+  batches: () => [...videoDeliveryKeys.all, "batches"] as const,
+  batchList: (filters: Record<string, unknown>) => [...videoDeliveryKeys.batches(), "list", filters] as const,
+  batchDetail: (id: string) => [...videoDeliveryKeys.batches(), "detail", id] as const,
+  deliveries: () => [...videoDeliveryKeys.all, "deliveries"] as const,
+  deliveryList: (filters: Record<string, unknown>) => [...videoDeliveryKeys.deliveries(), "list", filters] as const,
+  deliveryDetail: (id: string) => [...videoDeliveryKeys.deliveries(), "detail", id] as const,
+  stats: (filters: Record<string, unknown>) => [...videoDeliveryKeys.all, "stats", filters] as const,
+};
+
 // ── Employees ─────────────────────────────────────────────────────────────────
 
 export const employeeKeys = {
@@ -221,4 +232,3 @@ export const mediaVideoKeys = {
   shareLinks: (videoId: string) => [...mediaVideoKeys.all, "detail", videoId, "shareLinks"] as const,
   deliveries: (videoId: string) => [...mediaVideoKeys.all, "detail", videoId, "deliveries"] as const,
 };
-
